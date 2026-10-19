@@ -1,0 +1,6 @@
+{
+  "name": "TransFlow Johannesburg",
+  "description": "Mobile-first Johannesburg Metrobus and commuter transit planner, route directory, and taxi fare guide.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
