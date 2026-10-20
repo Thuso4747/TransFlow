@@ -20,6 +20,8 @@ interface JourneyMapProps {
   onDeletePastTrip?: (id: string) => void;
   initialLivePreview?: boolean;
   initialOpenPastId?: string | null;
+  initialCheckedTo?: number;
+  initialShareOpen?: boolean;
 }
 
 function minutesBetween(from: string, to: string): number {
@@ -137,15 +139,17 @@ export const JourneyMapScreen: React.FC<JourneyMapProps> = ({
   onDeletePastTrip,
   initialLivePreview = false,
   initialOpenPastId = null,
+  initialCheckedTo,
+  initialShareOpen = false,
 }) => {
   const [openPastId, setOpenPastId] = useState<string | null>(initialOpenPastId);
-  const [shareOpen, setShareOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(initialShareOpen);
   const [sharePhone, setSharePhone] = useState('');
   const [shareError, setShareError] = useState('');
   const [sharedWith, setSharedWith] = useState<string | null>(null);
   const [livePreview, setLivePreview] = useState(initialLivePreview);
   const pageTopRef = useRef<HTMLDivElement>(null);
-  const [checkedTo, setCheckedTo] = useState(-1);
+  const [checkedTo, setCheckedTo] = useState(initialCheckedTo ?? -1);
 
   useEffect(() => {
     const toTop = () => {
@@ -169,7 +173,9 @@ export const JourneyMapScreen: React.FC<JourneyMapProps> = ({
       setLivePreview(false);
       return;
     }
-    setCheckedTo(loadTripProgress(selectedJourney.id));
+    setCheckedTo(initialCheckedTo ?? loadTripProgress(selectedJourney.id));
+    setShareOpen(initialShareOpen);
+    setLivePreview(initialLivePreview);
   }, [selectedJourney?.id]);
 
   useEffect(() => {
@@ -507,7 +513,7 @@ export const JourneyMapScreen: React.FC<JourneyMapProps> = ({
                         <div className="min-w-0 flex-1">
                           <p
                             className={`text-[15px] font-semibold truncate ${
-                              passed ? 'text-[#687085]' : 'text-[#0d1747]'
+                              passed ? 'text-[#687085] line-through' : 'text-[#0d1747]'
                             }`}
                           >
                             {stop.name}
@@ -653,7 +659,7 @@ export const JourneyMapScreen: React.FC<JourneyMapProps> = ({
                       ) : null}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className={`text-[15px] font-semibold truncate ${passed ? 'text-[#687085]' : 'text-[#0d1747]'}`}>
+                      <p className={`text-[15px] font-semibold truncate ${passed ? 'text-[#687085] line-through' : 'text-[#0d1747]'}`}>
                         {stop.name}
                       </p>
                       <p
