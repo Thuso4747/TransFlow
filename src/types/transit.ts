@@ -34,7 +34,8 @@ export type ScreenId =
   | 'sharing-consent'
   | 'sharing-active'
   | 'approved-viewer'
-  | 'updates-paused';
+  | 'updates-paused'
+  | 'figma-board';
 
 export interface CommuterUser {
   fullName: string;

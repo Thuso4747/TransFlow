@@ -10,6 +10,7 @@ interface RouteDirectoryProps {
   onNavigate: (screen: ScreenId) => void;
   onSelectRouteForPlan?: (route: MetroRoute) => void;
   savedCount?: number;
+  initialMode?: 'bus' | 'taxi';
 }
 
 function Fact({ label, value }: { label: string; value: string }) {
@@ -25,8 +26,9 @@ export const RouteDirectoryScreen: React.FC<RouteDirectoryProps> = ({
   onNavigate,
   onSelectRouteForPlan,
   savedCount = 0,
+  initialMode = 'bus',
 }) => {
-  const [mode, setMode] = useState<'bus' | 'taxi'>('bus');
+  const [mode, setMode] = useState<'bus' | 'taxi'>(initialMode);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedRankId, setSelectedRankId] = useState<string | null>(null);

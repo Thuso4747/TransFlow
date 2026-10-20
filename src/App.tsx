@@ -35,6 +35,7 @@ import { HelpFaqScreen } from './components/screens/HelpFaqScreen';
 import { AboutScreen } from './components/screens/AboutScreen';
 import { SourcesDataScreen } from './components/screens/SourcesDataScreen';
 import { ClearDataScreen } from './components/screens/ClearDataScreen';
+import { FigmaBoardScreen } from './components/screens/FigmaBoardScreen';
 
 import { ProfileModal } from './components/modals/ProfileModal';
 import { MoreMenuProvider } from './components/common/MoreMenuContext';
@@ -51,6 +52,14 @@ import {
   saveSavedJourneys,
 } from './lib/offlineStore';
 
+function isFigmaBoardLocation() {
+  if (typeof window === 'undefined') return false;
+  const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+  const path = window.location.pathname.replace(/\/+$/, '').toLowerCase();
+  const query = new URLSearchParams(window.location.search);
+  return hash === 'figma' || path.endsWith('/figma') || query.has('figma');
+}
+
 const DEFAULT_A11Y: AppAccessibilitySettings = {
   textSize: '100%',
   highContrast: false,
@@ -62,7 +71,9 @@ const DEFAULT_A11Y: AppAccessibilitySettings = {
 };
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenId>('onboarding-1');
+  const [currentScreen, setCurrentScreen] = useState<ScreenId>(() =>
+    isFigmaBoardLocation() ? 'figma-board' : 'onboarding-1',
+  );
   const [isDeviceFrame] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -115,10 +126,24 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (currentScreen === 'figma-board') return;
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [currentScreen]);
+
+  useEffect(() => {
+    const applyLocation = () => {
+      if (isFigmaBoardLocation()) setCurrentScreen('figma-board');
+    };
+    applyLocation();
+    window.addEventListener('hashchange', applyLocation);
+    window.addEventListener('popstate', applyLocation);
+    return () => {
+      window.removeEventListener('hashchange', applyLocation);
+      window.removeEventListener('popstate', applyLocation);
+    };
+  }, []);
 
   useEffect(() => {
     saveSavedJourneys(savedJourneys);
@@ -358,6 +383,8 @@ export default function App() {
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
+      case 'figma-board':
+        return <FigmaBoardScreen />;
       case 'onboarding-1':
         return <Onboarding1Screen onNavigate={setCurrentScreen} />;
       case 'onboarding-2':
@@ -628,10 +655,10 @@ export default function App() {
       onOpenProfile={() => setIsProfileModalOpen(true)}
       onSignOut={handleSignOut}
     >
-    <div className="min-h-[100dvh] bg-[#f7f6f2] flex flex-col font-sans overflow-x-hidden">
+    <div className={`min-h-[100dvh] flex flex-col font-sans ${currentScreen === 'figma-board' ? 'bg-[#ece9e0] overflow-x-auto' : 'bg-[#f7f6f2] overflow-x-hidden'}`}>
       
       <div className="flex-1 flex justify-center items-start">
-        <main className="w-full max-w-md bg-[#f7f6f2] min-h-[100dvh] relative shadow-sm overflow-x-hidden">
+        <main className={`w-full min-h-[100dvh] relative ${currentScreen === 'figma-board' ? 'max-w-none bg-[#ece9e0] overflow-visible' : 'max-w-md bg-[#f7f6f2] shadow-sm overflow-x-hidden'}`}>
           
           {isDeviceFrame && (
             <div className="pt-3 px-6 flex items-center justify-between text-xs font-semibold text-[#0d1747] select-none bg-[#f7f6f2]">
