@@ -32,24 +32,19 @@ export const RouteMapScreen: React.FC<RouteMapScreenProps> = ({
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="journey-steps" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            JOURNEY OVERVIEW
-          </p>
-
-          {/* Title */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             Your route, at a glance.
           </h1>
 
-          {/* Subtitle */}
+          
           <div className="flex items-center gap-2 text-sm font-semibold text-[#555d71] mb-4">
             <span>{fromPlace}</span>
             <span className="text-[#84ad32] font-bold">→</span>
             <span>{toPlace}</span>
           </div>
 
-          {/* Summary Box */}
+          
           <div className="bg-white rounded-2xl p-4 border border-[#dedad0] grid grid-cols-2 text-center mb-5 shadow-2xs">
             <div>
               <p className="text-xl font-extrabold text-[#0d1747]">{fare}</p>
@@ -61,22 +56,22 @@ export const RouteMapScreen: React.FC<RouteMapScreenProps> = ({
             </div>
           </div>
 
-          {/* Scheduled departure row */}
+          
           <div className="bg-[#edeae2] p-3 rounded-2xl flex items-center justify-between text-xs mb-4">
             <span className="text-[#798090] font-semibold">Scheduled: SAST</span>
             <span className="font-extrabold text-[#0d1747]">{times}</span>
           </div>
 
-          {/* Schematic Vector Map Card */}
+          
           <div className="rounded-3xl border border-[#dedad0] overflow-hidden relative bg-[#eef3e8] p-4 shadow-inner mb-4">
-            {/* Top Badge */}
+            
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-xl text-[10px] font-bold text-[#0d1747] shadow-2xs border border-white">
                 <Compass className="w-3.5 h-3.5 text-[#84ad32]" />
                 <span>Schematic · demo network</span>
               </div>
 
-              {/* Zoom controls */}
+              
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setZoom((z) => Math.min(z + 0.15, 1.3))}
@@ -102,23 +97,23 @@ export const RouteMapScreen: React.FC<RouteMapScreenProps> = ({
               </div>
             </div>
 
-            {/* Schematic SVG Map */}
+            
             <div
               className="transition-transform duration-300 origin-center py-2"
               style={{ transform: `scale(${zoom})` }}
             >
               <svg viewBox="0 0 320 220" className="w-full h-56 select-none">
-                {/* Background grid markings */}
+                
                 <rect x="0" y="0" width="320" height="220" fill="#f4f7ee" rx="16" />
                 <line x1="20" y1="60" x2="300" y2="60" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
                 <line x1="20" y1="140" x2="300" y2="140" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
                 <line x1="160" y1="20" x2="160" y2="200" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
 
-                {/* Park green patches */}
+                
                 <circle cx="100" cy="100" r="28" fill="#e2edce" />
                 <circle cx="230" cy="140" r="32" fill="#e2edce" />
 
-                {/* Main transit line: Central -> Oak Street -> Northside */}
+                
                 <path
                   d="M 50 160 Q 110 140, 160 110 T 270 50"
                   stroke="#84ad32"
@@ -127,7 +122,7 @@ export const RouteMapScreen: React.FC<RouteMapScreenProps> = ({
                   strokeLinecap="round"
                 />
 
-                {/* Transfer walk connection */}
+                
                 <path
                   d="M 160 110 L 175 125"
                   stroke="#0d1747"
@@ -136,19 +131,19 @@ export const RouteMapScreen: React.FC<RouteMapScreenProps> = ({
                   fill="none"
                 />
 
-                {/* Stop 1: Central */}
+                
                 <circle cx="50" cy="160" r="7" fill="#ffffff" stroke="#0d1747" strokeWidth="3.5" />
                 <text x="50" y="185" fill="#0d1747" fontSize="10" fontWeight="bold" textAnchor="middle">
                   Central Interchange
                 </text>
 
-                {/* Stop 2: Oak Street */}
+                
                 <circle cx="160" cy="110" r="6" fill="#84ad32" stroke="#ffffff" strokeWidth="2.5" />
                 <text x="160" y="95" fill="#0d1747" fontSize="9" fontWeight="bold" textAnchor="middle">
                   Oak Street (Transfer)
                 </text>
 
-                {/* Stop 3: Northside */}
+                
                 <circle cx="270" cy="50" r="7" fill="#84ad32" stroke="#0d1747" strokeWidth="3.5" />
                 <text x="270" y="35" fill="#0d1747" fontSize="10" fontWeight="bold" textAnchor="middle">
                   Northside Campus
@@ -157,7 +152,7 @@ export const RouteMapScreen: React.FC<RouteMapScreenProps> = ({
             </div>
           </div>
 
-          {/* Companion note */}
+          
           <div className="p-3.5 bg-white rounded-2xl border border-[#dedad0] flex items-start gap-2.5 text-xs text-[#555d71] shadow-2xs mb-4">
             <Info className="w-4 h-4 text-[#798090] shrink-0 mt-0.5" />
             <p className="leading-relaxed">

@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import { ScreenId, CommuterUser, JourneySearchParams } from '../../types/transit';
+import React, { useMemo, useState } from 'react';
+import { ScreenId, CommuterUser, JourneySearchParams, JourneyOption } from '../../types/transit';
 import {
   ArrowUpDown,
   Clock,
   MapPin,
   ChevronDown,
-  ChevronRight,
   Search,
-  Sliders,
-  Footprints,
-  Info,
   ArrowRight,
-  User,
-  CreditCard,
   Check,
+  Bus,
+  X,
 } from 'lucide-react';
-import { DisclaimerFooter } from '../common/DisclaimerFooter';
 import { BottomNav } from '../common/BottomNav';
+import { TransFlowHeader } from '../common/TransFlowHeader';
+import {
+  ORIGIN_PLACES,
+  getConnectingRoutes,
+  getDestinationsFrom,
+  getUpcomingDepartures,
+  shiftTime,
+} from '../../data/metrobusRoutes';
 
 interface HomeDashboardProps {
   onNavigate: (screen: ScreenId) => void;
@@ -24,447 +27,426 @@ interface HomeDashboardProps {
   onUpdateSearchParams: (params: Partial<JourneySearchParams>) => void;
   commuter: CommuterUser;
   onOpenProfile: () => void;
+  onStartTrip: (journey: JourneyOption) => void;
+  savedCount?: number;
 }
-
-const COMMON_JOBURG_STOPS = [
-  'Park Station',
-  'Rosebank Mall',
-  'Sandton City',
-  'Gandhi Square',
-  'Braamfontein',
-  'Wits University',
-  'Auckland Park UJ',
-  'Cresta Shopping Centre',
-  'Soweto Orlando',
-  'Eastgate Mall',
-];
 
 export const HomeDashboardScreen: React.FC<HomeDashboardProps> = ({
   onNavigate,
   searchParams,
   onUpdateSearchParams,
-  commuter,
-  onOpenProfile,
+  onStartTrip,
+  savedCount = 0,
 }) => {
-  const [fromQuery, setFromQuery] = useState(searchParams.fromLocation || 'Park Station');
-  const [toQuery, setToQuery] = useState(searchParams.toLocation || 'Rosebank Mall');
-  const [leaveTime, setLeaveTime] = useState(searchParams.leaveTime || 'Wed, 14 Oct · 08:10');
-  const [preferences, setPreferences] = useState(searchParams.preferences || 'Bus + walking · fewest transfers');
+  const [fromPlace, setFromPlace] = useState(searchParams.fromLocation || '');
+  const [toPlace, setToPlace] = useState(searchParams.toLocation || '');
+  const [leaveTime, setLeaveTime] = useState(searchParams.leaveTime || '');
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
-  const [activeInput, setActiveInput] = useState<'from' | 'to' | null>(null);
+  const [picker, setPicker] = useState<'from' | 'to' | null>(null);
+  const [placeQuery, setPlaceQuery] = useState('');
+  const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
+
+  const reachableTo = useMemo(() => (fromPlace ? getDestinationsFrom(fromPlace) : []), [fromPlace]);
+
+  const pickerPlaces = useMemo(() => {
+    const q = placeQuery.trim().toLowerCase();
+    const source = picker === 'from' ? ORIGIN_PLACES : reachableTo;
+    return source.filter((place) => {
+      if (picker === 'from' && place === toPlace) return false;
+      if (!q) return true;
+      return place.toLowerCase().includes(q);
+    });
+  }, [placeQuery, picker, toPlace, reachableTo]);
+
+  const connectingRoutes = useMemo(() => {
+    if (!fromPlace || !toPlace) return [];
+    return [...getConnectingRoutes(fromPlace, toPlace)].sort(
+      (a, b) => Number(Boolean(a.via)) - Number(Boolean(b.via)) || a.durationMinutes - b.durationMinutes,
+    );
+  }, [fromPlace, toPlace]);
+
+  const suggestedTrips = useMemo(() => {
+    if (!fromPlace || !toPlace || !leaveTime) return [];
+    const order = new Map(connectingRoutes.map((route, index) => [route.id, index]));
+    const rows = connectingRoutes.flatMap((route) =>
+      getUpcomingDepartures(route, leaveTime, 8).map((slot) => ({
+        key: `${route.id}-${slot.depart}`,
+        route,
+        depart: slot.depart,
+        arrive: slot.arrive,
+      })),
+    );
+    rows.sort(
+      (a, b) =>
+        a.depart.localeCompare(b.depart) || (order.get(a.route.id) ?? 0) - (order.get(b.route.id) ?? 0),
+    );
+    if (rows.length === 0) return [];
+    const first = rows[0];
+    const next = rows.find((row) => row.depart > first.depart);
+    return next ? [first, next] : [first];
+  }, [connectingRoutes, leaveTime]);
+
+  const activeTrip =
+    selectedTrip && suggestedTrips.some((trip) => trip.key === selectedTrip)
+      ? selectedTrip
+      : suggestedTrips[0]?.key ?? null;
 
   const handleSwap = () => {
-    const temp = fromQuery;
-    setFromQuery(toQuery);
-    setToQuery(temp);
-    onUpdateSearchParams({ fromLocation: toQuery, toLocation: temp });
+    if (!fromPlace || !toPlace) return;
+    const newFrom = toPlace;
+    const newTo = fromPlace;
+    const allowed = getDestinationsFrom(newFrom);
+    if (!allowed.includes(newTo)) return;
+    setFromPlace(newFrom);
+    setToPlace(newTo);
+    setSelectedTrip(null);
+    onUpdateSearchParams({ fromLocation: newFrom, toLocation: newTo });
   };
 
-  const handleFindJourney = () => {
-    onUpdateSearchParams({
-      fromLocation: fromQuery || 'Park Station',
-      toLocation: toQuery || 'Rosebank Mall',
-      leaveTime,
-      preferences,
-    });
-    onNavigate('journey-filter');
+  const selectPlace = (place: string) => {
+    if (picker === 'from') {
+      setFromPlace(place);
+      const nextDests = getDestinationsFrom(place);
+      const nextTo = nextDests.includes(toPlace) ? toPlace : '';
+      setToPlace(nextTo);
+      setSelectedTrip(null);
+      onUpdateSearchParams({ fromLocation: place, toLocation: nextTo });
+    } else if (picker === 'to') {
+      setToPlace(place);
+      setSelectedTrip(null);
+      onUpdateSearchParams({ toLocation: place });
+    }
+    setPicker(null);
+    setPlaceQuery('');
   };
 
-  const handleViewJourneyMap = (departureOverride?: string) => {
-    onUpdateSearchParams({
-      fromLocation: fromQuery || 'Park Station',
-      toLocation: toQuery || 'Rosebank Mall',
-      leaveTime: departureOverride || leaveTime,
-      preferences,
+  const minutesLater = (from: string, to: string) => {
+    const [ah, am] = from.split(':').map(Number);
+    const [bh, bm] = to.split(':').map(Number);
+    return Math.max(1, bh * 60 + bm - (ah * 60 + am));
+  };
+
+  const chooseTrip = (routeId: string, depart: string) => {
+    setSelectedTrip(`${routeId}-${depart}`);
+  };
+
+  const handleStartTrip = () => {
+    const chosen = suggestedTrips.find((trip) => trip.key === activeTrip);
+    if (!chosen) return;
+    const route = chosen.route;
+    const slot = { depart: chosen.depart, arrive: chosen.arrive };
+
+    const walkBefore = 4;
+    const walkAfter = 3;
+    const boardTime = slot.depart;
+    const walkStart = shiftTime(boardTime, -walkBefore);
+
+    onStartTrip({
+      id: chosen.key,
+      departureTime: slot.depart,
+      arrivalTime: slot.arrive,
+      durationMinutes: route.durationMinutes + walkBefore + walkAfter,
+      fare: route.fare,
+      fareType: 'Cash / Metrobus card',
+      crowding: 'Seats available',
+      crowdingColor: '#96BD47',
+      badge: route.via ? undefined : 'DIRECT BUS (NO TRANSFER)',
+      origin: fromPlace,
+      destination: toPlace,
+      transfersCount: 0,
+      transferDetails: route.via ? `Via ${route.via}` : 'Direct',
+      busLine: route.letter,
+      walkingMinutesBefore: walkBefore,
+      walkingMinutesAfter: walkAfter,
+      isDirect: !route.via,
+      steps: [
+        {
+          type: 'walk',
+          title: `Walk to ${fromPlace} stop`,
+          duration: `${walkBefore} min`,
+          instruction: `Go to the Metrobus stop at ${fromPlace} and wait for route ${route.letter}.`,
+          time: walkStart,
+          distance: 'about 250 m',
+        },
+        {
+          type: 'bus',
+          title: `Board Metrobus ${route.letter}`,
+          duration: `${route.durationMinutes} min`,
+          instruction: route.via
+            ? `Travel towards ${toPlace} via ${route.via}. Stay on board until ${toPlace}.`
+            : `Direct service to ${toPlace}. Stay on board until the destination stop.`,
+          time: slot.depart,
+          details: `${route.distanceKm} km · ${route.fare}`,
+        },
+        {
+          type: 'walk',
+          title: `Alight at ${toPlace}`,
+          duration: `${walkAfter} min`,
+          instruction: `Get off at ${toPlace} and walk to your final point.`,
+          time: slot.arrive,
+          distance: 'about 180 m',
+        },
+      ],
     });
-    onNavigate('journey-map');
   };
 
   return (
-    <div className="min-h-screen pb-24 pt-6 px-4 max-w-md mx-auto">
-      {/* Headline Header matching Figma */}
-      <div className="mb-5">
-        <p className="text-[11px] font-extrabold tracking-wider text-[#0d1747] uppercase mb-1">
-          Johannesburg / Journey Planner
-        </p>
-        <h1 className="text-[34px] font-extrabold text-[#0d1747] tracking-tight leading-[1.08] mb-2">
-          Your city.<br />Your next stop.
-        </h1>
-        <p className="text-[14px] text-[#555d71]">
-          Plan a Metrobus journey across Johannesburg.
-        </p>
-      </div>
+    <div className="min-h-full pb-20 max-w-md mx-auto">
+      <TransFlowHeader onNavigate={onNavigate} />
 
-      {/* Main Search Card */}
-      <div className="bg-white rounded-3xl p-4.5 shadow-sm border border-[#e6e2d8] mb-6">
-        <div className="flex items-center justify-between mb-3.5">
-          <h2 className="text-lg font-bold text-[#0d1747]">
-            Let&apos;s get you there.
-          </h2>
-          <button
-            onClick={() => setIsPreferencesOpen(true)}
-            className="p-1.5 text-[#0d1747] hover:bg-slate-100 rounded-xl transition-colors"
-            title="Search options & preferences"
-          >
-            <Sliders className="w-5 h-5 stroke-[2.2]" />
-          </button>
+      <div className="pt-5 px-4">
+        <div className="mb-5">
+          <h1 className="text-[34px] font-extrabold text-[#0d1747] tracking-tight leading-[1.08] mb-2">
+            Your city.<br />Your next stop.
+          </h1>
+          <p className="text-[14px] text-[#555d71]">
+            Choose an origin, then only real Metrobus destinations will appear.
+          </p>
         </div>
 
-        {/* Inputs stack */}
-        <div className="space-y-2 relative">
-          {/* FROM input */}
-          <div className="bg-[#edeae2] rounded-2xl p-3 flex items-center gap-3 relative focus-within:ring-2 focus-within:ring-[#0d1747] transition-all">
-            <div className="w-6 h-6 rounded-full border-2 border-[#0d1747] flex items-center justify-center shrink-0">
-              <div className="w-2 h-2 rounded-full bg-[#0d1747]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#687085]">
-                From
-              </span>
-              <input
-                type="text"
-                value={fromQuery}
-                onFocus={() => setActiveInput('from')}
-                onChange={(e) => {
-                  setFromQuery(e.target.value);
-                  onUpdateSearchParams({ fromLocation: e.target.value });
-                }}
-                placeholder="Enter starting stop or station"
-                className="w-full bg-transparent font-bold text-sm text-[#0d1747] placeholder-[#81899e] focus:outline-hidden"
-              />
-            </div>
-          </div>
-
-          {/* Swap Button on right */}
-          <div className="flex justify-end pr-3 -my-2 relative z-10">
+        <div className="mb-7">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-[#0d1747]">Let&apos;s get you there</h2>
             <button
               onClick={handleSwap}
-              className="w-7 h-7 bg-white hover:bg-slate-100 rounded-full border border-[#d8d3c7] shadow-xs flex items-center justify-center text-[#0d1747] active:scale-95 transition-transform"
+              className="p-1.5 -mr-1.5 text-[#0d1747] hover:bg-[#ece9e0] rounded-xl transition-colors"
               title="Swap origin and destination"
             >
-              <ArrowUpDown className="w-3.5 h-3.5" />
+              <ArrowUpDown className="w-5 h-5 stroke-[2.2]" />
             </button>
           </div>
 
-          {/* TO input */}
-          <div className="bg-[#edeae2] rounded-2xl p-3 flex items-center gap-3 relative focus-within:ring-2 focus-within:ring-[#0d1747] transition-all">
-            <MapPin className="w-5 h-5 text-[#0d1747] shrink-0" />
-            <div className="flex-1 min-w-0">
-              <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#687085]">
-                To
-              </span>
-              <input
-                type="text"
-                value={toQuery}
-                onFocus={() => setActiveInput('to')}
-                onChange={(e) => {
-                  setToQuery(e.target.value);
-                  onUpdateSearchParams({ toLocation: e.target.value });
+          <div>
+            <div className="relative">
+              <div className="absolute left-[15px] top-7 bottom-7 w-px bg-[#96BD47]/45" aria-hidden />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setPlaceQuery('');
+                  setPicker('from');
                 }}
-                placeholder="Enter destination or landmark"
-                className="w-full bg-transparent font-bold text-sm text-[#0d1747] placeholder-[#81899e] focus:outline-hidden"
-              />
+                className="w-full py-2.5 flex items-center gap-3 text-left"
+              >
+                <span className="relative z-10 flex h-[31px] w-[31px] shrink-0 items-center justify-center bg-[#f7f6f2]">
+                  <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-[#96BD47]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#96BD47]" />
+                  </span>
+                </span>
+                <span className="min-w-0 flex-1 border-b border-[#ece9e0] pb-2.5">
+                  <span className="block text-[12px] text-[#687085]">From</span>
+                  <span className={`block font-semibold text-[15px] truncate ${fromPlace ? 'text-[#0d1747]' : 'text-[#81899e]'}`}>
+                    {fromPlace || 'Select origin'}
+                  </span>
+                </span>
+                <ChevronDown className="w-4 h-4 text-[#555d71] shrink-0" />
+              </button>
+
+              <button
+                type="button"
+                disabled={!fromPlace}
+                onClick={() => {
+                  if (!fromPlace) return;
+                  setPlaceQuery('');
+                  setPicker('to');
+                }}
+                className="w-full py-2.5 flex items-center gap-3 text-left disabled:opacity-50"
+              >
+                <span className="relative z-10 flex h-[31px] w-[31px] shrink-0 items-center justify-center bg-[#f7f6f2]">
+                  <MapPin className="w-4 h-4 text-[#0d1747]" />
+                </span>
+                <span className="min-w-0 flex-1 border-b border-[#ece9e0] pb-2.5">
+                  <span className="block text-[12px] text-[#687085]">To</span>
+                  <span className={`block font-semibold text-[15px] truncate ${toPlace ? 'text-[#0d1747]' : 'text-[#81899e]'}`}>
+                    {fromPlace ? toPlace || 'Select destination' : 'Select origin first'}
+                  </span>
+                </span>
+                <ChevronDown className="w-4 h-4 text-[#555d71] shrink-0" />
+              </button>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
+              className="w-full py-2.5 flex items-center gap-3 text-left"
+            >
+              <span className="flex h-[31px] w-[31px] shrink-0 items-center justify-center">
+                <Clock className="w-4 h-4 text-[#0d1747]" />
+              </span>
+              <span className={`min-w-0 flex-1 ${isTimePickerOpen ? '' : 'border-b border-[#ece9e0]'} pb-2.5`}>
+                <span className="block text-[12px] text-[#687085]">Leave at</span>
+                <span className={`block font-semibold text-[15px] ${leaveTime ? 'text-[#0d1747]' : 'text-[#81899e]'}`}>
+                  {leaveTime || 'Select time'}
+                </span>
+              </span>
+              <ChevronDown className={`w-4 h-4 text-[#555d71] shrink-0 transition-transform ${isTimePickerOpen ? 'rotate-180' : ''}`} />
+            </button>
           </div>
 
-          {/* Quick stop autocomplete suggestions pill bar if typing/focused */}
-          {activeInput && (
-            <div className="p-2.5 bg-[#f5f3ec] rounded-2xl border border-[#dedad0] animate-fadeIn">
-              <div className="flex items-center justify-between mb-1.5 px-1">
-                <span className="text-[10px] font-bold text-[#6d7589] uppercase tracking-wider">
-                  Quick Select Stop for {activeInput === 'from' ? 'Origin' : 'Destination'}:
-                </span>
-                <button
-                  onClick={() => setActiveInput(null)}
-                  className="text-[10px] font-bold text-[#0d1747]"
-                >
-                  Done
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
-                {COMMON_JOBURG_STOPS.map((stop) => (
-                  <button
-                    key={stop}
-                    type="button"
-                    onClick={() => {
-                      if (activeInput === 'from') {
-                        setFromQuery(stop);
-                        onUpdateSearchParams({ fromLocation: stop });
-                      } else {
-                        setToQuery(stop);
-                        onUpdateSearchParams({ toLocation: stop });
-                      }
-                      setActiveInput(null);
-                    }}
-                    className="px-2.5 py-1 bg-white hover:bg-[#0d1747] hover:text-white rounded-lg text-xs font-semibold text-[#0d1747] border border-[#dedad0] transition-colors"
-                  >
-                    {stop}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* LEAVE AT input */}
-          <div
-            onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
-            className="border border-[#dbd7cc] bg-white rounded-2xl p-3 flex items-center justify-between cursor-pointer hover:border-[#0d1747] transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-[#0d1747] shrink-0" />
-              <div>
-                <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#687085]">
-                  Leave at
-                </span>
-                <span className="font-bold text-xs text-[#0d1747]">
-                  {leaveTime}
-                </span>
-              </div>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-[#555d71] transition-transform ${isTimePickerOpen ? 'rotate-180' : ''}`} />
-          </div>
-
-          {/* Time Picker Dropdown */}
           {isTimePickerOpen && (
-            <div className="p-2 bg-[#f4f2ec] rounded-2xl border border-[#d8d3c7] space-y-1 text-xs font-semibold animate-fadeIn">
-              {[
-                'Depart Now (Live)',
-                'Wed, 14 Oct · 08:10',
-                'Wed, 14 Oct · 08:40',
-                'Wed, 14 Oct · 09:10',
-                'Today · 17:15 (Afternoon Peak)',
-              ].map((time) => (
-                <div
+            <div className="ml-[43px] pb-1 space-y-0.5">
+              {['Depart now', 'Today · 06:15', 'Today · 07:30', 'Today · 08:15', 'Today · 12:00', 'Today · 16:30', 'Today · 17:15'].map((time) => (
+                <button
                   key={time}
+                  type="button"
                   onClick={() => {
                     setLeaveTime(time);
                     setIsTimePickerOpen(false);
+                    setSelectedTrip(null);
                     onUpdateSearchParams({ leaveTime: time });
                   }}
-                  className="px-3 py-2 rounded-xl hover:bg-white cursor-pointer text-[#0d1747] flex items-center justify-between"
+                  className="w-full py-2 pr-1 text-[14px] font-medium text-[#0d1747] flex items-center justify-between text-left"
                 >
                   <span>{time}</span>
-                  {leaveTime === time && <Check className="w-3.5 h-3.5 text-[#84ad32]" />}
-                </div>
+                  {leaveTime === time && <Check className="w-4 h-4 text-[#96BD47]" />}
+                </button>
               ))}
             </div>
           )}
-
-          {/* Preference Row */}
-          <button
-            onClick={() => setIsPreferencesOpen(true)}
-            className="w-full flex items-center justify-between px-2 py-1.5 text-xs text-[#485065] hover:text-[#0d1747]"
-          >
-            <div className="flex items-center gap-2">
-              <Sliders className="w-3.5 h-3.5" />
-              <span className="font-medium text-[12px]">{preferences}</span>
-            </div>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          {/* Find a journey Button */}
-          <div className="pt-1">
-            <button
-              onClick={handleFindJourney}
-              className="w-full bg-[#0d1747] hover:bg-[#142161] active:scale-[0.99] text-white py-3.5 px-6 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0d1747]/15 transition-all"
-            >
-              <span>Find a journey</span>
-              <Search className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Recent Journey */}
-          <div className="pt-3 border-t border-[#edeae2] flex items-center gap-2.5">
-            <Clock className="w-4 h-4 text-[#798090] shrink-0" />
-            <div
-              onClick={() => {
-                setFromQuery('Park Station');
-                setToQuery('Rosebank Mall');
-                onUpdateSearchParams({ fromLocation: 'Park Station', toLocation: 'Rosebank Mall' });
-              }}
-              className="cursor-pointer"
-            >
-              <p className="text-[9px] font-extrabold uppercase tracking-wider text-[#798090]">
-                Recent Journey
-              </p>
-              <p className="text-xs font-bold text-[#0d1747] hover:underline">
-                Park Station → Rosebank Mall
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Your journey options Section */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-lg font-bold text-[#0d1747]">
-              Your journey options
-            </h3>
-            <p className="text-xs text-[#555d71]">
-              3 example journeys · no transfers
-            </p>
-          </div>
-          <button
-            onClick={() => onNavigate('journey-filter')}
-            className="p-1.5 text-[#0d1747] hover:bg-slate-100 rounded-xl"
-            title="Sort options"
-          >
-            <svg className="w-5 h-5 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2">
-              <line x1="4" y1="6" x2="20" y2="6" />
-              <line x1="4" y1="12" x2="14" y2="12" />
-              <line x1="4" y1="18" x2="9" y2="18" />
-            </svg>
-          </button>
         </div>
 
-        {/* Featured Recommended Journey Card */}
-        <div className="border-2 border-[#84ad32] rounded-3xl p-4.5 bg-white shadow-xs mb-3 transition-all hover:shadow-md">
-          {/* Card Top: Duration + Recommended Pill */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-4xl font-extrabold text-[#0d1747] tracking-tight">46</span>
-              <span className="text-sm font-semibold text-[#555d71]">min</span>
-            </div>
-            <span className="bg-[#e1ecfa] text-[#1c3f76] text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">
-              Recommended
-            </span>
-          </div>
-
-          {/* Timeline steps */}
-          <div className="flex items-center gap-2 mb-4 text-xs font-bold text-[#0d1747]">
-            <div className="flex items-center gap-1">
-              <Footprints className="w-3.5 h-3.5 text-[#6c7487]" />
-              <span>6 min</span>
-            </div>
-            <span className="text-[#a8afbe]">&gt;</span>
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-md bg-[#84ad32] text-white flex items-center justify-center font-extrabold text-xs">
-                A
-              </div>
-              <span>36 min</span>
-            </div>
-            <span className="text-[#a8afbe]">&gt;</span>
-            <div className="flex items-center gap-1">
-              <Footprints className="w-3.5 h-3.5 text-[#6c7487]" />
-              <span>4 min</span>
-            </div>
-          </div>
-
-          {/* Time & Fare Row */}
-          <div className="flex items-center justify-between pb-4">
+        {fromPlace && toPlace && leaveTime ? (
+        <div className="mb-6">
+          {connectingRoutes.length === 0 ? (
+            <>
+              <h3 className="text-lg font-bold text-[#0d1747] mb-1">Choose a bus and time</h3>
+              <p className="text-sm text-[#555d71]">No Metrobus service between these stops.</p>
+            </>
+          ) : suggestedTrips.length === 0 ? (
+            <>
+              <h3 className="text-lg font-bold text-[#0d1747] mb-1">Choose a bus and time</h3>
+              <p className="text-sm text-[#555d71]">No more buses from {fromPlace} for the selected time.</p>
+            </>
+          ) : (
             <div>
-              <p className="text-base font-extrabold text-[#0d1747]">
-                08:10 – 08:56
-              </p>
-              <p className="text-xs text-[#555d71]">
-                Example A · via Jan Smuts Avenue
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-base font-extrabold text-[#0d1747]">
-                R18.00
-              </p>
-              <p className="text-[10px] text-[#717b94]">
-                standard fare
-              </p>
-            </div>
-          </div>
-
-          {/* Green Action Button */}
-          <button
-            onClick={() => handleViewJourneyMap('08:10 – 08:56')}
-            className="w-full bg-[#84ad32] hover:bg-[#749b29] active:scale-[0.99] text-white py-3.5 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
-          >
-            <span>View journey map</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Departure 2 Card */}
-        <div
-          onClick={() => handleViewJourneyMap('08:40 – 09:26')}
-          className="bg-white rounded-2xl p-4 border border-[#e5e1d7] mb-2.5 flex items-center justify-between cursor-pointer hover:border-[#0d1747] transition-colors"
-        >
-          <div>
-            <p className="text-sm font-extrabold text-[#0d1747]">08:40 – 09:26</p>
-            <p className="text-xs text-[#555d71]">46 min · Example A · 30 min later</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-[#798090]" />
-        </div>
-
-        {/* Departure 3 Card */}
-        <div
-          onClick={() => handleViewJourneyMap('09:10 – 09:56')}
-          className="bg-white rounded-2xl p-4 border border-[#e5e1d7] mb-4 flex items-center justify-between cursor-pointer hover:border-[#0d1747] transition-colors"
-        >
-          <div>
-            <p className="text-sm font-extrabold text-[#0d1747]">09:10 – 09:56</p>
-            <p className="text-xs text-[#555d71]">46 min · Example A · 60 min later</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-[#798090]" />
-        </div>
-
-        {/* Info notice box */}
-        <div className="bg-[#eef3f6] border border-[#d8e3eb] p-3.5 rounded-2xl flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-[#1c3f76] shrink-0 mt-0.5" />
-          <p className="text-xs text-[#1c3f76] leading-relaxed font-medium">
-            A little planning goes a long way. Check current routes, boarding points, fares and payment methods with Metrobus before travelling.
-          </p>
-        </div>
-      </div>
-
-      {/* Preferences Modal */}
-      {isPreferencesOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end justify-center">
-          <div className="bg-white rounded-t-3xl max-w-md w-full p-5 max-h-[80vh] overflow-y-auto animate-slideUp">
-            <div className="flex items-center justify-between pb-4 border-b border-[#eeebe3]">
-              <h3 className="font-extrabold text-lg text-[#0d1747]">
-                Commute Preferences
+              <h3 className="text-[22px] font-extrabold text-[#0d1747] tracking-tight leading-tight">
+                {fromPlace} → {toPlace}
               </h3>
+              <p className="mt-1 mb-3 text-sm text-[#555d71]">Choose a departure from {fromPlace}</p>
+
+              <div className="rounded-2xl border border-[#e6e2d8] bg-white overflow-hidden">
+                {suggestedTrips.map((row, index) => {
+                  const isActive = activeTrip === row.key;
+                  const isNext = index === 1;
+                  const laterMins = isNext ? minutesLater(suggestedTrips[0].depart, row.depart) : 0;
+
+                  return (
+                    <button
+                      key={row.key}
+                      type="button"
+                      onClick={() => chooseTrip(row.route.id, row.depart)}
+                      className={`w-full flex items-start gap-3 px-4 py-4 text-left transition-colors ${
+                        index > 0 ? 'border-t border-[#f0eee6]' : ''
+                      } ${isActive ? 'bg-[#f4f8ea]' : 'bg-white hover:bg-[#faf9f6]'}`}
+                    >
+                      <span
+                        className={`mt-1 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 ${
+                          isActive ? 'border-[#96BD47]' : 'border-[#c5c9d4]'
+                        }`}
+                        aria-hidden
+                      >
+                        {isActive && <span className="h-2 w-2 rounded-full bg-[#96BD47]" />}
+                      </span>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className={`text-[11px] font-semibold ${isActive ? 'text-[#6a8a2e]' : 'text-[#687085]'}`}>
+                            {isNext
+                              ? `Next available · ${laterMins} min later`
+                              : leaveTime === 'Depart now'
+                                ? 'Earliest bus'
+                                : 'At your time'}
+                          </p>
+                          <p className="text-sm font-bold text-[#0d1747] tabular-nums">{row.route.fare}</p>
+                        </div>
+
+                        <div className="mt-1 flex items-baseline gap-2">
+                          <span className="text-[22px] font-extrabold tabular-nums leading-none text-[#0d1747]">
+                            {row.depart}
+                          </span>
+                          <span className="text-sm font-medium text-[#96BD47]">→</span>
+                          <span className="text-[15px] font-semibold tabular-nums text-[#555d71]">{row.arrive}</span>
+                        </div>
+
+                        <p className="mt-1.5 text-sm font-semibold text-[#0d1747] truncate">
+                          Route {row.route.letter}
+                          {row.route.via ? ` · via ${row.route.via}` : ' · direct'}
+                          {` · ${row.route.distanceKm} km · ${row.route.durationMinutes} min`}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
               <button
-                onClick={() => setIsPreferencesOpen(false)}
-                className="text-xs font-bold text-[#0d1747] px-3 py-1 bg-slate-100 rounded-lg"
+                onClick={handleStartTrip}
+                disabled={!activeTrip}
+                className="mt-3 w-full bg-[#96BD47] hover:bg-[#7fa53a] disabled:bg-[#c5cad6] disabled:cursor-not-allowed text-white py-3.5 px-6 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
               >
-                Done
+                <span>Start trip</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-            <div className="py-4 space-y-3">
-              {[
-                'Bus + walking · fewest transfers',
-                'Bus only · minimal walking',
-                'Fastest route · direct corridors',
-                'Connect with minibus taxi rank',
-              ].map((opt) => (
-                <div
-                  key={opt}
-                  onClick={() => {
-                    setPreferences(opt);
-                    onUpdateSearchParams({ preferences: opt });
-                    setIsPreferencesOpen(false);
-                  }}
-                  className={`p-3.5 rounded-2xl border cursor-pointer flex items-center justify-between transition-colors ${
-                    preferences === opt
-                      ? 'border-[#0d1747] bg-[#0d1747] text-white font-bold'
-                      : 'border-[#dedad0] bg-white text-[#0d1747]'
-                  }`}
-                >
-                  <span className="text-xs">{opt}</span>
-                  {preferences === opt && <Check className="w-4 h-4 text-[#84ad32]" />}
+          )}
+        </div>
+        ) : null}
+
+        {picker && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end justify-center">
+            <div className="bg-white rounded-t-3xl max-w-md w-full p-5 max-h-[82vh] flex flex-col">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-extrabold text-lg text-[#0d1747]">
+                    {picker === 'from' ? 'Select origin' : 'Select destination'}
+                  </h3>
+                  {picker === 'to' && (
+                    <p className="text-[11px] text-[#717b94]">Only stops Metrobus serves from {fromPlace}</p>
+                  )}
                 </div>
-              ))}
+                <button
+                  onClick={() => {
+                    setPicker(null);
+                    setPlaceQuery('');
+                  }}
+                  className="p-1 text-[#0d1747]"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2 bg-[#f4f2ec] rounded-2xl px-3 py-2.5 mb-3">
+                <Search className="w-4 h-4 text-[#798090]" />
+                <input
+                  autoFocus
+                  value={placeQuery}
+                  onChange={(e) => setPlaceQuery(e.target.value)}
+                  placeholder="Search a stop or suburb"
+                  className="w-full bg-transparent text-sm font-semibold text-[#0d1747] placeholder-[#81899e] focus:outline-hidden"
+                />
+              </div>
+              <div className="overflow-y-auto -mx-1 px-1">
+                {pickerPlaces.map((place) => (
+                  <button
+                    key={place}
+                    type="button"
+                    onClick={() => selectPlace(place)}
+                    className="w-full flex items-center gap-3 py-3 border-b border-[#f0eee6] text-left"
+                  >
+                    <Bus className="w-4 h-4 text-[#96BD47] shrink-0" />
+                    <span className="text-sm font-semibold text-[#0d1747]">{place}</span>
+                  </button>
+                ))}
+                {pickerPlaces.length === 0 && (
+                  <p className="text-xs text-[#717b94] py-6 text-center">No Metrobus stops match.</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Footer */}
-      <DisclaimerFooter />
-
-      {/* Bottom Navigation */}
-      <BottomNav currentScreen="home-dashboard" onNavigate={onNavigate} />
+      <BottomNav currentScreen="home-dashboard" onNavigate={onNavigate} savedCount={savedCount} />
     </div>
   );
 };

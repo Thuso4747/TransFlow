@@ -33,7 +33,7 @@ export const ResultsFilterModal: React.FC<ResultsFilterModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-[#dedad0] animate-fadeIn max-h-[90vh] overflow-y-auto">
-        {/* Header */}
+        
         <div className="flex items-center justify-between pb-4 border-b border-[#ece9e0] mb-4">
           <h3 className="font-extrabold text-base text-[#0d1747]">
             Sort &amp; filter
@@ -47,7 +47,7 @@ export const ResultsFilterModal: React.FC<ResultsFilterModalProps> = ({
         </div>
 
         <div className="space-y-4">
-          {/* Sort By */}
+          
           <div>
             <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1.5">
               Sort by
@@ -67,7 +67,7 @@ export const ResultsFilterModal: React.FC<ResultsFilterModalProps> = ({
             </div>
           </div>
 
-          {/* Maximum Transfers */}
+          
           <div>
             <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1.5">
               Maximum transfers
@@ -87,7 +87,7 @@ export const ResultsFilterModal: React.FC<ResultsFilterModalProps> = ({
             </div>
           </div>
 
-          {/* Walking Preference */}
+          
           <div>
             <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1.5">
               Walking preference
@@ -105,7 +105,7 @@ export const ResultsFilterModal: React.FC<ResultsFilterModalProps> = ({
             </div>
           </div>
 
-          {/* Bus corridors Checkbox */}
+          
           <label className="flex items-start gap-2.5 cursor-pointer pt-1">
             <div
               onClick={() => onToggleBusCorridors(!busCorridors)}
@@ -125,12 +125,12 @@ export const ResultsFilterModal: React.FC<ResultsFilterModalProps> = ({
             </div>
           </label>
 
-          {/* Info note */}
+          
           <div className="p-3 bg-[#eef3f8] border border-[#d6e3f0] rounded-2xl text-[11px] text-[#1b3a6b] leading-relaxed">
             Only bus corridors are supported in this demo. Minibus taxi rank details are handled separately.
           </div>
 
-          {/* Action buttons */}
+          
           <div className="flex gap-2.5 pt-2">
             <button
               onClick={() => {

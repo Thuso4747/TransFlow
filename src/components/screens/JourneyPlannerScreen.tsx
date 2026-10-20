@@ -65,22 +65,17 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
         <TransFlowHeader onNavigate={onNavigate} />
 
         <div className="px-5 pt-6 pb-2">
-          {/* Section Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            LET&apos;S GET YOU THERE
-          </p>
-
-          {/* Headline */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-2">
             Where are you going?
           </h1>
 
-          {/* Subtitle */}
+          
           <p className="text-[13px] text-[#555d71] leading-relaxed mb-5">
             Plan a journey with clearer information, from the first step to the last.
           </p>
 
-          {/* Main Card */}
+          
           <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#e5e1d7] mb-5">
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#f0eee6]">
               <div className="flex items-center gap-2">
@@ -92,7 +87,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
             </div>
 
             <form onSubmit={handleSearch} className="space-y-3">
-              {/* FROM */}
+              
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                   From
@@ -121,7 +116,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
                 </div>
               </div>
 
-              {/* Swap Places Button */}
+              
               <div className="flex justify-center -my-1">
                 <button
                   type="button"
@@ -133,7 +128,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
                 </button>
               </div>
 
-              {/* TO */}
+              
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                   To
@@ -160,7 +155,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
                 </div>
               </div>
 
-              {/* Use my location button */}
+              
               <div>
                 <button
                   type="button"
@@ -172,7 +167,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
                 </button>
               </div>
 
-              {/* Date & When to Travel Grid */}
+              
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <div>
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
@@ -208,7 +203,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
                 </div>
               </div>
 
-              {/* Departure Time */}
+              
               <div className="pt-1">
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                   Departure time · SAST (24-hour)
@@ -224,7 +219,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
                 </div>
               </div>
 
-              {/* Submit button */}
+              
               <div className="pt-2">
                 <button
                   type="submit"
@@ -237,7 +232,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
             </form>
           </div>
 
-          {/* Quick Cards Grid */}
+          
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div
               onClick={() => onNavigate('taxi-directory')}
@@ -267,7 +262,7 @@ export const JourneyPlannerScreen: React.FC<JourneyPlannerProps> = ({
             </div>
           </div>
 
-          {/* SAST note */}
+          
           <p className="text-[11px] text-[#798090] text-center pb-2">
             Time zone: South African Standard Time (SAST)
           </p>

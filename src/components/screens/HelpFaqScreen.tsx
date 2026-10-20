@@ -2,131 +2,111 @@ import React, { useState } from 'react';
 import { ScreenId } from '../../types/transit';
 import { TransFlowHeader } from '../common/TransFlowHeader';
 import { BottomNav } from '../common/BottomNav';
-import { Search, ChevronDown, ChevronUp, ArrowRight, X } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 
 interface HelpFaqProps {
   onNavigate: (screen: ScreenId) => void;
   savedCount?: number;
 }
 
+const FAQS = [
+  {
+    q: 'How do I plan a journey?',
+    a: 'On Plan, choose From, To and a leave time. Pick a bus, then tap Start trip.',
+    actionText: 'Plan a trip',
+    actionScreen: 'home-dashboard' as ScreenId,
+  },
+  {
+    q: 'What is the difference between saved and downloaded?',
+    a: 'Saved journeys are shortcuts on this device. Download for offline also stores the trip so you can track stops without data.',
+  },
+  {
+    q: 'Are these fares guaranteed?',
+    a: 'No. Fares are estimates. Confirm with the driver or rank marshal before you board.',
+  },
+  {
+    q: 'Can I use a larger text size?',
+    a: 'Yes. Open Accessibility from the menu and choose Large or Extra large.',
+    actionText: 'Open Accessibility',
+    actionScreen: 'accessibility' as ScreenId,
+  },
+];
+
 export const HelpFaqScreen: React.FC<HelpFaqProps> = ({ onNavigate, savedCount = 0 }) => {
   const [query, setQuery] = useState('');
-  const [openIndex, setOpenIndex] = useState<number | null>(0); // First expanded matching Screen 24
-
-  const FAQS = [
-    {
-      q: 'How do I plan a journey?',
-      a: 'Choose a suggested planner, or travel date and Leave now, Depart at or Arrive by. Open a result to see boarding and drop-off instructions.',
-      hasAction: true,
-      actionText: 'Plan a journey →',
-      actionScreen: 'journey-planner' as ScreenId,
-    },
-    {
-      q: 'What is the difference between saved and downloaded?',
-      a: 'Saved journeys store a quick shortcut on your device for fast access. Downloading creates an offline copy including full text directions, fares, and schematic diagrams for use when you have no data or signal.',
-    },
-    {
-      q: 'Are these fares guaranteed?',
-      a: 'No. Fares displayed in TransFlow are indicative estimates based on regular published corridor schedules and recent rank reviews. Minibus taxi and peak bus fares should always be confirmed with the driver or rank marshall before boarding.',
-    },
-    {
-      q: 'What happens if a report fails?',
-      a: 'Your report draft is safely preserved on your local device. Once connection returns or local review is available, you can submit the saved draft.',
-    },
-    {
-      q: 'Can I use a larger text size?',
-      a: 'Yes. Visit More → Accessibility to select between 100%, 115%, and 130% text scaling, as well as high-contrast border mode.',
-      hasAction: true,
-      actionText: 'Open Accessibility →',
-      actionScreen: 'accessibility' as ScreenId,
-    },
-  ];
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const filteredFaqs = FAQS.filter(
-    (f) =>
-      f.q.toLowerCase().includes(query.toLowerCase()) ||
-      f.a.toLowerCase().includes(query.toLowerCase())
+    (item) =>
+      item.q.toLowerCase().includes(query.toLowerCase()) ||
+      item.a.toLowerCase().includes(query.toLowerCase()),
   );
 
   return (
-    <div className="min-h-screen pb-24 bg-[#f7f6f2] flex flex-col justify-between max-w-md mx-auto">
-      <div>
-        <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
+    <div className="min-h-full pb-20 bg-[#f7f6f2] max-w-md mx-auto">
+      <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
 
-        <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            A LITTLE GUIDANCE
-          </p>
+      <div className="pt-5 px-4">
+        <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight">
+          Help.
+        </h1>
+        <p className="mt-2 mb-5 text-sm text-[#555d71] leading-relaxed">
+          Answers for planning, saving and offline use.
+        </p>
 
-          {/* Title */}
-          <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
-            We&apos;ll help you find your way.
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-[13px] text-[#555d71] leading-relaxed mb-4">
-            Practical answers for planning, saving, offline use and sharing.
-          </p>
-
-          {/* Search bar */}
-          <div className="bg-white rounded-2xl border border-[#dedad0] p-3 flex items-center gap-2.5 mb-5 shadow-2xs">
-            <Search className="w-4 h-4 text-[#798090] shrink-0" />
+        <label className="flex items-center gap-3 py-2.5">
+          <Search className="w-4 h-4 text-[#0d1747] shrink-0" />
+          <span className="min-w-0 flex-1 border-b border-[#ece9e0] pb-2.5 flex items-center gap-2">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search help topics"
-              className="w-full bg-transparent text-xs font-semibold text-[#0d1747] placeholder-[#798090] focus:outline-hidden"
+              placeholder="Search help"
+              className="w-full bg-transparent text-[15px] font-semibold text-[#0d1747] placeholder-[#81899e] focus:outline-hidden"
             />
-            {query && (
-              <button onClick={() => setQuery('')} className="p-1 text-slate-400">
-                <X className="w-3.5 h-3.5" />
+            {query ? (
+              <button type="button" onClick={() => setQuery('')} className="p-1 text-[#0d1747]" aria-label="Clear">
+                <X className="w-4 h-4" />
               </button>
-            )}
-          </div>
+            ) : null}
+          </span>
+        </label>
 
-          {/* FAQ Accordions matching Screen 24 */}
-          <div className="space-y-3 mb-6">
-            {filteredFaqs.map((faq, idx) => {
-              const isOpen = openIndex === idx;
-
-              return (
-                <div
-                  key={idx}
-                  className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs transition-all"
+        <div className="mt-3">
+          {filteredFaqs.map((faq, idx) => {
+            const isOpen = openIndex === idx;
+            return (
+              <div key={faq.q} className="border-b border-[#ece9e0]">
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  className="w-full py-3.5 flex items-start gap-3 text-left"
                 >
-                  <button
-                    onClick={() => setOpenIndex(isOpen ? null : idx)}
-                    className="w-full flex items-center justify-between text-left text-xs font-bold text-[#0d1747]"
-                  >
-                    <span>{faq.q}</span>
-                    {isOpen ? (
-                      <ChevronUp className="w-4 h-4 text-[#798090] shrink-0 ml-2" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-[#798090] shrink-0 ml-2" />
+                  <p className="flex-1 text-[15px] font-semibold text-[#0d1747]">{faq.q}</p>
+                  <ChevronDown
+                    className={`w-4 h-4 mt-1 shrink-0 text-[#687085] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="pb-4">
+                    <p className="text-sm text-[#555d71] leading-relaxed">{faq.a}</p>
+                    {faq.actionScreen && (
+                      <button
+                        type="button"
+                        onClick={() => onNavigate(faq.actionScreen)}
+                        className="mt-3 text-sm font-semibold text-[#0d1747]"
+                      >
+                        {faq.actionText}
+                      </button>
                     )}
-                  </button>
-
-                  {isOpen && (
-                    <div className="mt-3 pt-3 border-t border-[#f0eee6] text-xs text-[#555d71] leading-relaxed space-y-3">
-                      <p>{faq.a}</p>
-                      {faq.hasAction && (
-                        <div>
-                          <button
-                            onClick={() => onNavigate(faq.actionScreen!)}
-                            className="font-bold text-[#0d1747] hover:underline flex items-center gap-1"
-                          >
-                            <span>{faq.actionText}</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {filteredFaqs.length === 0 && (
+            <p className="py-6 text-sm text-[#555d71]">No topics match.</p>
+          )}
         </div>
       </div>
 

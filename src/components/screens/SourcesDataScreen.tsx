@@ -15,24 +15,19 @@ export const SourcesDataScreen: React.FC<SourcesDataProps> = ({ onNavigate, save
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            KNOW WHAT&apos;S KNOWN
-          </p>
-
-          {/* Title */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             A clearer view of the information.
           </h1>
 
-          {/* Subtitle */}
+          
           <p className="text-[13px] text-[#555d71] leading-relaxed mb-5">
             Read each label in context. Different terms imply clear, different things.
           </p>
 
-          {/* Definition Cards matching Screen 23 */}
+          
           <div className="space-y-3.5 mb-5">
-            {/* Community reported */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs">
               <h4 className="text-xs font-extrabold text-[#0d1747] mb-1">Community reported</h4>
               <p className="text-xs text-[#555d71] leading-relaxed">
@@ -40,7 +35,7 @@ export const SourcesDataScreen: React.FC<SourcesDataProps> = ({ onNavigate, save
               </p>
             </div>
 
-            {/* Indicative */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs">
               <h4 className="text-xs font-extrabold text-[#0d1747] mb-1">Indicative</h4>
               <p className="text-xs text-[#555d71] leading-relaxed">
@@ -48,7 +43,7 @@ export const SourcesDataScreen: React.FC<SourcesDataProps> = ({ onNavigate, save
               </p>
             </div>
 
-            {/* Reviewed */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs">
               <h4 className="text-xs font-extrabold text-[#0d1747] mb-1">Reviewed</h4>
               <p className="text-xs text-[#555d71] leading-relaxed">
@@ -56,7 +51,7 @@ export const SourcesDataScreen: React.FC<SourcesDataProps> = ({ onNavigate, save
               </p>
             </div>
 
-            {/* Last location update */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs">
               <h4 className="text-xs font-extrabold text-[#0d1747] mb-1">Last location update</h4>
               <p className="text-xs text-[#555d71] leading-relaxed">
@@ -64,7 +59,7 @@ export const SourcesDataScreen: React.FC<SourcesDataProps> = ({ onNavigate, save
               </p>
             </div>
 
-            {/* Unknown */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs">
               <h4 className="text-xs font-extrabold text-[#0d1747] mb-1">Unknown</h4>
               <p className="text-xs text-[#555d71] leading-relaxed">
@@ -72,7 +67,7 @@ export const SourcesDataScreen: React.FC<SourcesDataProps> = ({ onNavigate, save
               </p>
             </div>
 
-            {/* Configured providers */}
+            
             <div className="bg-[#edeae2] rounded-3xl p-4.5 border border-[#dedad0]">
               <h4 className="text-xs font-extrabold text-[#0d1747] mb-1">Configured providers</h4>
               <p className="text-xs text-[#555d71] leading-relaxed mb-2">

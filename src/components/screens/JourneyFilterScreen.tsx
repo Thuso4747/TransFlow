@@ -17,6 +17,7 @@ import {
   Check,
 } from 'lucide-react';
 import { BottomNav } from '../common/BottomNav';
+import { TransFlowHeader } from '../common/TransFlowHeader';
 
 interface JourneyFilterProps {
   onNavigate: (screen: ScreenId) => void;
@@ -77,12 +78,12 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
     });
 
   return (
-    <div className="min-h-screen pb-24 pt-5 px-4 max-w-md mx-auto">
-      {/* Header tag */}
+    <div className="min-h-screen pb-24 max-w-md mx-auto">
+      <TransFlowHeader onNavigate={onNavigate} />
+
+      <div className="pt-5 px-4">
+      
       <div className="mb-4">
-        <p className="text-[11px] font-extrabold tracking-wider text-[#0d1747] uppercase mb-1">
-          03 / Journey Results
-        </p>
         <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
           Find your way forward.
         </h1>
@@ -92,7 +93,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
           <span>{toPlace}</span>
         </div>
 
-        {/* Edit search button */}
+        
         <button
           onClick={() => onNavigate('home-dashboard')}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#0d1747] rounded-xl text-xs font-bold text-[#0d1747] hover:bg-[#0d1747] hover:text-white transition-all mb-4"
@@ -101,7 +102,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
           <span>Edit search</span>
         </button>
 
-        {/* Filter chips row */}
+        
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
           <div className="bg-white border border-[#dedad0] rounded-xl px-3 py-1.5 flex items-center gap-1.5 font-semibold text-[#0d1747] shrink-0 shadow-2xs">
             <Calendar className="w-3.5 h-3.5 text-[#555d71]" />
@@ -114,7 +115,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
         </div>
       </div>
 
-      {/* Sort & Filter Controls */}
+      
       <div className="flex items-center justify-between py-2.5 mb-3 border-y border-[#e5e1d7]">
         <div className="flex items-center gap-1 text-xs font-bold text-[#0d1747]">
           <span>Sort:</span>
@@ -139,7 +140,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
         </button>
       </div>
 
-      {/* Journeys List */}
+      
       <div className="space-y-3.5">
         {filteredJourneys.map((journey) => {
           const isExpanded = expandedJourneyId === journey.id;
@@ -150,7 +151,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
               key={journey.id}
               className="bg-white rounded-2xl p-4 border border-[#e5e1d7] shadow-xs hover:border-[#84ad32] transition-all"
             >
-              {/* Badge & Favorite Row */}
+              
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-sm ${journey.badgeStyle}`}>
                   {journey.badge}
@@ -166,9 +167,9 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                 </button>
               </div>
 
-              {/* Main Schedule Row */}
+              
               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 mb-3">
-                {/* Left: Origin Time */}
+                
                 <div>
                   <p className="text-2xl font-extrabold text-[#0d1747] leading-tight">
                     {journey.departureTime}
@@ -178,7 +179,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                   </p>
                 </div>
 
-                {/* Center: Route / Bus pills */}
+                
                 <div className="flex flex-col items-center">
                   <span className="text-[11px] font-bold text-[#555d71] mb-1">
                     {journey.durationMinutes} min
@@ -202,7 +203,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                   </span>
                 </div>
 
-                {/* Right: Destination Time */}
+                
                 <div className="text-right">
                   <p className="text-2xl font-extrabold text-[#0d1747] leading-tight">
                     {journey.arrivalTime}
@@ -213,7 +214,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                 </div>
               </div>
 
-              {/* Fare & Crowding Row */}
+              
               <div className="flex items-center justify-between pt-2 pb-2 text-xs">
                 <div>
                   <span className="font-extrabold text-[#0d1747] text-base">
@@ -231,7 +232,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                 </div>
               </div>
 
-              {/* Dotted line & Expand Toggle */}
+              
               <div className="border-t border-dashed border-[#e0dcce] pt-2 mt-1">
                 <button
                   onClick={() => toggleExpand(journey.id)}
@@ -241,7 +242,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                   <span>{isExpanded ? '−' : '+'}</span>
                 </button>
 
-                {/* Expanded Turn-by-Turn Steps */}
+                
                 {isExpanded && (
                   <div className="mt-3 pt-2 border-t border-[#f0eee8] space-y-2.5">
                     {journey.steps.map((step, idx) => (
@@ -287,7 +288,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
         })}
       </div>
 
-      {/* Filter Modal Drawer */}
+      
       {isFilterModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end justify-center">
           <div className="bg-white rounded-t-3xl max-w-md w-full p-5 max-h-[85vh] overflow-y-auto animate-slideUp">
@@ -307,7 +308,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
             </div>
 
             <div className="py-4 space-y-5">
-              {/* Transfer filter */}
+              
               <div>
                 <label className="block text-xs font-bold text-[#0d1747] uppercase tracking-wider mb-2">
                   Transfers
@@ -333,7 +334,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                 </div>
               </div>
 
-              {/* Crowding filter */}
+              
               <div>
                 <label className="block text-xs font-bold text-[#0d1747] uppercase tracking-wider mb-2">
                   Crowding Preference
@@ -358,7 +359,7 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
                 </div>
               </div>
 
-              {/* Apply / Reset Buttons */}
+              
               <div className="pt-2 flex gap-3">
                 <button
                   onClick={() => {
@@ -381,7 +382,9 @@ export const JourneyFilterScreen: React.FC<JourneyFilterProps> = ({
         </div>
       )}
 
-      {/* Bottom Nav */}
+      </div>
+
+      
       <BottomNav currentScreen="journey-filter" onNavigate={onNavigate} />
     </div>
   );

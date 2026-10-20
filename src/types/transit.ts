@@ -8,33 +8,33 @@ export type ScreenId =
   | 'journey-map'
   | 'journey-filter'
   | 'route-directory'
-  | 'welcome'               // Screen 01
-  | 'journey-planner'       // Screen 02
-  | 'journey-results'       // Screen 03
-  | 'journey-steps'         // Screen 05
-  | 'route-map'             // Screen 06
-  | 'taxi-directory'        // Screen 07
-  | 'taxi-details'          // Screen 08
-  | 'report-issue'          // Screen 09
-  | 'report-received'       // Screen 10
-  | 'saved-journeys'        // Screen 11 & 12
-  | 'settings'              // Screen 13
-  | 'accessibility'         // Screen 14
-  | 'language'              // Screen 15
-  | 'clear-data'            // Screen 16
-  | 'more'                  // Screen 17
-  | 'about'                 // Screen 18
-  | 'offline-downloads'     // Screen 19
-  | 'offline-journey'       // Screen 20
-  | 'data-preferences'      // Screen 21
-  | 'sources-data'          // Screen 23
-  | 'help-faq'              // Screen 24
-  | 'family-sharing'        // Screen 25
-  | 'pair-viewer'           // Screen 26
-  | 'sharing-consent'       // Screen 27
-  | 'sharing-active'        // Screen 28
-  | 'approved-viewer'       // Screen 29
-  | 'updates-paused';       // Screen 30
+  | 'welcome'
+  | 'journey-planner'
+  | 'journey-results'
+  | 'journey-steps'
+  | 'route-map'
+  | 'taxi-directory'
+  | 'taxi-details'
+  | 'report-issue'
+  | 'report-received'
+  | 'saved-journeys'
+  | 'settings'
+  | 'accessibility'
+  | 'language'
+  | 'clear-data'
+  | 'more'
+  | 'about'
+  | 'offline-downloads'
+  | 'offline-journey'
+  | 'data-preferences'
+  | 'sources-data'
+  | 'help-faq'
+  | 'family-sharing'
+  | 'pair-viewer'
+  | 'sharing-consent'
+  | 'sharing-active'
+  | 'approved-viewer'
+  | 'updates-paused';
 
 export interface CommuterUser {
   fullName: string;
@@ -52,12 +52,15 @@ export interface RouteStop {
   name: string;
   time?: string;
   isTerminal?: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 export interface MetroRoute {
   id: string;
   letter: string;
   title: string;
+  origin: string;
   destination: string;
   via: string;
   direction: 'northbound' | 'southbound' | 'west' | 'east';
@@ -67,6 +70,9 @@ export interface MetroRoute {
   stopsCount: number;
   stops: RouteStop[];
   color: string;
+  distanceKm: number;
+  durationMinutes: number;
+  nearbyTaxis: { stop: string; ranks: string }[];
 }
 
 export interface JourneyOption {
@@ -124,6 +130,7 @@ export interface SavedJourney {
   dateSaved: string;
   scheduledTime: string;
   isOfflineDownloaded: boolean;
+  snapshot?: JourneyOption;
 }
 
 export interface OfflinePackage {
@@ -135,6 +142,19 @@ export interface OfflinePackage {
   destination: string;
   fare: string;
   durationMinutes: number;
+  snapshot?: JourneyOption;
+}
+
+export interface PastTrip {
+  id: string;
+  origin: string;
+  destination: string;
+  fare: string;
+  durationMinutes: number;
+  scheduledTime: string;
+  busLine?: string;
+  endedAt: string;
+  endedDate: string;
 }
 
 export interface ReportItem {
@@ -162,6 +182,7 @@ export interface AppAccessibilitySettings {
   textSize: '100%' | '115%' | '130%';
   highContrast: boolean;
   reduceMotion: boolean;
+  darkMode: boolean;
   language: 'English' | 'Afrikaans' | 'isiZulu' | 'Sesotho';
   lowDataMode: boolean;
   downloadOnlyWifi: boolean;

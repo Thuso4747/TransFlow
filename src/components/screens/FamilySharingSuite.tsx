@@ -34,18 +34,15 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
     sharingState.isSharingActive ? 'active' : 'overview'
   );
 
-  // Pair Viewer Form
   const [pairingCode, setPairingCode] = useState('');
   const [parentConsent, setParentConsent] = useState(false);
   const [pairSuccess, setPairSuccess] = useState(false);
 
-  // Sharing Consent Form
   const [selectedViewer, setSelectedViewer] = useState('Sam · Demo viewer');
   const [sharingDuration, setSharingDuration] = useState('15 minutes');
   const [locationMode, setLocationMode] = useState('Simulated demo');
   const [consentAgreed, setConsentAgreed] = useState(false);
 
-  // Countdown simulation
   const [secondsRemaining, setSecondsRemaining] = useState(sharingState.secondsRemaining || 839);
 
   useEffect(() => {
@@ -108,12 +105,9 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
       <div>
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
 
-        {/* SUBVIEW 1: OVERVIEW (Screen 25) */}
+        
         {subView === 'overview' && (
           <div className="px-5 pt-5 pb-2">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-              FAMILY CONNECTION
-            </p>
             <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
               A little peace of mind, with permission.
             </h1>
@@ -121,7 +115,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
               Signed in as Alex · Demo traveller. Your role: <span className="font-bold text-[#0d1747]">traveller</span>.
             </p>
 
-            {/* Approved relationships Card */}
+            
             <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-4">
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#f0eee6]">
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0d1747]">
@@ -136,7 +130,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 </button>
               </div>
 
-              {/* Sam Demo Viewer */}
+              
               <div className="p-3.5 bg-[#f7f6f2] rounded-2xl border border-[#dedad0] mb-3 flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-extrabold text-[#0d1747]">
@@ -163,7 +157,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
               </button>
             </div>
 
-            {/* Pairing requests Card */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs mb-4">
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                 Pairing requests
@@ -171,7 +165,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
               <p className="text-xs text-[#555d71]">No pending requests.</p>
             </div>
 
-            {/* Current sessions */}
+            
             <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs mb-4">
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                 Current sessions
@@ -183,12 +177,9 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
           </div>
         )}
 
-        {/* SUBVIEW 2: PAIR VIEWER (Screen 26) */}
+        
         {subView === 'pair' && (
           <div className="px-5 pt-5 pb-2">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-              SET UP TOGETHER
-            </p>
             <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
               Pair a trusted viewer.
             </h1>
@@ -257,12 +248,9 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
           </div>
         )}
 
-        {/* SUBVIEW 3: SHARING CONSENT (Screen 27) */}
+        
         {subView === 'consent' && (
           <div className="px-5 pt-5 pb-2">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-              YOU CONTROL THIS
-            </p>
             <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
               Start journey sharing?
             </h1>
@@ -271,7 +259,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
             </p>
 
             <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs space-y-4 mb-4">
-              {/* Approved viewer dropdown */}
+              
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                   Approved viewer
@@ -281,7 +269,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 </div>
               </div>
 
-              {/* Chosen journey */}
+              
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
                   This journey
@@ -292,7 +280,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 </div>
               </div>
 
-              {/* Duration & Mode grid */}
+              
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#798090] mb-1">
@@ -328,7 +316,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 Estimated expiry: 16 Oct 2026, 23:34 SAST
               </p>
 
-              {/* Consent checkbox */}
+              
               <label className="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-[#f0eee6]">
                 <div
                   onClick={() => setConsentAgreed(!consentAgreed)}
@@ -343,7 +331,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 </span>
               </label>
 
-              {/* Action buttons */}
+              
               <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
@@ -365,10 +353,10 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
           </div>
         )}
 
-        {/* SUBVIEW 4: ACTIVE SHARING (Screen 28) */}
+        
         {subView === 'active' && (
           <div className="px-5 pt-4 pb-2">
-            {/* Green countdown banner */}
+            
             <div className="bg-[#f0f6e6] border border-[#d6e5be] p-3 rounded-2xl flex items-center justify-between mb-4 text-xs font-bold text-[#3d6717]">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#84ad32] animate-pulse" />
@@ -378,15 +366,11 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 {formatTimer(secondsRemaining)} remaining
               </span>
             </div>
-
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1">
-              YOUR CURRENT SESSION
-            </p>
             <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-4">
               Sharing stays in your control.
             </h1>
 
-            {/* Session stats card */}
+            
             <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-4 space-y-3 text-xs">
               <div className="flex justify-between items-center pb-2 border-b border-[#f0eee6]">
                 <span className="font-extrabold text-[#0d1747]">Updates received</span>
@@ -419,7 +403,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 </div>
               </div>
 
-              {/* Stop button */}
+              
               <div className="pt-2">
                 <button
                   onClick={handleStopSharing}
@@ -431,7 +415,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
               </div>
             </div>
 
-            {/* Schematic live map preview */}
+            
             <div className="bg-[#eef3e8] rounded-3xl p-4 border border-[#dedad0] mb-4">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0d1747] mb-2">
                 <Compass className="w-3.5 h-3.5 text-[#84ad32]" />
@@ -441,7 +425,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
                 <path d="M 30 60 Q 120 20, 180 50 T 270 30" stroke="#84ad32" strokeWidth="5" fill="none" />
                 <circle cx="30" cy="60" r="5" fill="#ffffff" stroke="#0d1747" strokeWidth="2.5" />
                 <circle cx="270" cy="30" r="5" fill="#84ad32" stroke="#0d1747" strokeWidth="2.5" />
-                {/* Active blinking device point */}
+                
                 <circle cx="180" cy="50" r="9" fill="#0d1747" stroke="#ffffff" strokeWidth="3" className="animate-pulse" />
               </svg>
               <p className="text-[10px] text-[#798090] text-center pt-1">
@@ -449,7 +433,7 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
               </p>
             </div>
 
-            {/* Quick toggle to view Screen 29 (Approved Viewer Mode) */}
+            
             <div className="text-center pb-2">
               <button
                 onClick={() => setSubView('viewer')}
@@ -461,12 +445,9 @@ export const FamilySharingSuite: React.FC<FamilySharingProps> = ({
           </div>
         )}
 
-        {/* SUBVIEW 5: APPROVED VIEWER (Screen 29 & 30) */}
+        
         {subView === 'viewer' && (
           <div className="px-5 pt-5 pb-2">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-              APPROVED VIEWER
-            </p>
             <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
               A view of their journey.
             </h1>

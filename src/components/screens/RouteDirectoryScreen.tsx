@@ -1,285 +1,264 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ScreenId, MetroRoute } from '../../types/transit';
-import { METRO_ROUTES } from '../../data/mockData';
-import {
-  Search,
-  ChevronDown,
-  ChevronRight,
-  Info,
-  ArrowRight,
-  X,
-} from 'lucide-react';
-import { DisclaimerFooter } from '../common/DisclaimerFooter';
+import { METRO_ROUTES } from '../../data/metrobusRoutes';
+import { TAXI_RANK_LISTINGS } from '../../data/taxiRanks';
+import { Search, X, ArrowRight, ChevronDown } from 'lucide-react';
 import { BottomNav } from '../common/BottomNav';
+import { TransFlowHeader } from '../common/TransFlowHeader';
 
 interface RouteDirectoryProps {
   onNavigate: (screen: ScreenId) => void;
   onSelectRouteForPlan?: (route: MetroRoute) => void;
+  savedCount?: number;
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 py-2.5 border-b border-[#ece9e0]">
+      <span className="text-[12px] text-[#687085] shrink-0">{label}</span>
+      <span className="text-[15px] font-semibold text-[#0d1747] text-right">{value}</span>
+    </div>
+  );
 }
 
 export const RouteDirectoryScreen: React.FC<RouteDirectoryProps> = ({
   onNavigate,
   onSelectRouteForPlan,
+  savedCount = 0,
 }) => {
+  const [mode, setMode] = useState<'bus' | 'taxi'>('bus');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterDirection, setFilterDirection] = useState<'all' | 'northbound' | 'west'>('all');
-  const [selectedRouteId, setSelectedRouteId] = useState<string>('route-a');
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [selectedRankId, setSelectedRankId] = useState<string | null>(null);
 
-  const filteredRoutes = METRO_ROUTES.filter((r) => {
-    const matchesSearch =
-      r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.via.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.letter.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredRoutes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return METRO_ROUTES;
+    return METRO_ROUTES.filter(
+      (route) =>
+        route.letter.toLowerCase().includes(q) ||
+        route.origin.toLowerCase().includes(q) ||
+        route.destination.toLowerCase().includes(q) ||
+        route.via.toLowerCase().includes(q) ||
+        route.nearbyTaxis.some(
+          (link) => link.stop.toLowerCase().includes(q) || link.ranks.toLowerCase().includes(q),
+        ),
+    );
+  }, [searchQuery]);
 
-    if (!matchesSearch) return false;
+  const filteredRanks = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return TAXI_RANK_LISTINGS;
+    return TAXI_RANK_LISTINGS.filter(
+      (rank) =>
+        rank.name.toLowerCase().includes(q) ||
+        rank.location.toLowerCase().includes(q) ||
+        rank.routes.some((item) => item.toLowerCase().includes(q)) ||
+        rank.note.toLowerCase().includes(q) ||
+        rank.nearbyMetrobus.some(
+          (link) =>
+            link.stop.toLowerCase().includes(q) ||
+            link.routes.toLowerCase().includes(q) ||
+            link.detail.toLowerCase().includes(q),
+        ),
+    );
+  }, [searchQuery]);
 
-    if (filterDirection === 'northbound' && r.direction !== 'northbound') return false;
-    if (filterDirection === 'west' && r.direction !== 'west') return false;
-
-    return true;
-  });
-
-  const selectedRoute = METRO_ROUTES.find((r) => r.id === selectedRouteId) || METRO_ROUTES[0];
+  const selectedRoute = METRO_ROUTES.find((route) => route.id === selectedRouteId) || null;
 
   const handlePlanWithRoute = () => {
-    if (onSelectRouteForPlan) {
-      onSelectRouteForPlan(selectedRoute);
-    }
+    if (!selectedRoute) return;
+    if (onSelectRouteForPlan) onSelectRouteForPlan(selectedRoute);
     onNavigate('home-dashboard');
   };
 
   return (
-    <div className="min-h-screen pb-24 pt-5 px-4 max-w-md mx-auto">
-      {/* Top Header */}
-      <div className="mb-4">
-        <p className="text-[11px] font-extrabold tracking-wider text-[#0d1747] uppercase mb-1">
-          Johannesburg / Route Directory
-        </p>
-        <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
+    <div className="min-h-full pb-20 max-w-md mx-auto">
+      <TransFlowHeader onNavigate={onNavigate} />
+
+      <div className="pt-5 px-4">
+        <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight">
           Find your route.
         </h1>
-        <p className="text-[13px] text-[#555d71]">
-          Explore example Metrobus corridors across the city.
+        <p className="mt-2 mb-5 text-sm text-[#555d71]">
+          {mode === 'bus'
+            ? 'Metrobus corridors from Gandhi Square.'
+            : 'Johannesburg CBD taxi ranks.'}
         </p>
-      </div>
 
-      {/* Search Input */}
-      <div className="bg-white rounded-2xl border border-[#dedad0] p-3 flex items-center gap-2.5 mb-3.5 shadow-2xs">
-        <Search className="w-4 h-4 text-[#798090] shrink-0" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search a route, suburb or stop"
-          className="w-full bg-transparent text-xs font-semibold text-[#0d1747] placeholder-[#798090] focus:outline-hidden"
-        />
-        {searchQuery && (
-          <button onClick={() => setSearchQuery('')} className="p-1 text-slate-400">
-            <X className="w-3.5 h-3.5" />
-          </button>
+        <div className="grid grid-cols-2 gap-1 p-1 mb-5 rounded-full bg-[#ece9e0]">
+          {(['bus', 'taxi'] as const).map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => {
+                setMode(item);
+                setSearchQuery('');
+                setSelectedRouteId(null);
+                setSelectedRankId(null);
+              }}
+              className={`py-2.5 rounded-full text-sm font-semibold capitalize transition-colors ${
+                mode === item ? 'bg-[#0d1747] text-white' : 'text-[#555d71]'
+              }`}
+            >
+              {item === 'bus' ? 'Bus' : 'Taxi'}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3 py-2.5 mb-1">
+          <Search className="w-4 h-4 text-[#0d1747] shrink-0" />
+          <div className="min-w-0 flex-1 border-b border-[#ece9e0] pb-2.5">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={mode === 'bus' ? 'Search a route or suburb' : 'Search a rank or area'}
+              className="w-full bg-transparent text-[15px] font-semibold text-[#0d1747] placeholder-[#81899e] focus:outline-hidden"
+            />
+          </div>
+          {searchQuery ? (
+            <button type="button" onClick={() => setSearchQuery('')} className="p-1 text-[#687085]" aria-label="Clear search">
+              <X className="w-4 h-4" />
+            </button>
+          ) : null}
+        </div>
+
+        {mode === 'bus' ? (
+          <div className="mt-2">
+            {filteredRoutes.length === 0 ? (
+              <p className="py-6 text-sm text-[#555d71]">No Metrobus routes match.</p>
+            ) : (
+              filteredRoutes.map((route) => {
+                const isOpen = selectedRouteId === route.id;
+                return (
+                  <div key={route.id} className="border-b border-[#ece9e0]">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRouteId(isOpen ? null : route.id)}
+                      className="w-full py-3.5 flex items-start gap-3 text-left"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-semibold text-[#0d1747]">
+                          {route.origin} → {route.destination}
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-4 h-4 mt-1 shrink-0 text-[#687085] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {isOpen && (
+                      <div className="pb-4">
+                        <Fact label="Route" value={route.letter} />
+                        <Fact label="Via" value={route.via || 'Direct'} />
+                        <Fact label="Distance" value={`${route.distanceKm} km`} />
+                        <Fact label="Typical time" value={`${route.durationMinutes} min`} />
+                        <Fact label="Fare (estimate)" value={route.fare} />
+
+                        <p className="mt-4 mb-1 text-[12px] text-[#687085]">Nearby taxi ranks</p>
+                        {route.nearbyTaxis.map((link) => (
+                          <div key={link.stop} className="py-2.5 border-b border-[#ece9e0]">
+                            <p className="text-[18px] font-extrabold leading-none text-[#96BD47]">
+                              {link.ranks}
+                            </p>
+                            <p className="mt-2 text-[15px] font-semibold text-[#0d1747]">{link.stop}</p>
+                          </div>
+                        ))}
+
+                        <p className="mt-4 mb-1 text-[12px] text-[#687085]">Stops</p>
+                        <div className="relative pl-4">
+                          <div className="absolute left-[5px] top-1.5 bottom-1.5 w-px bg-[#96BD47]/45" aria-hidden />
+                          {route.stops.map((stop, index) => (
+                            <div key={stop.id} className="relative flex items-baseline justify-between gap-3 py-1.5">
+                              <span
+                                className={`absolute -left-4 top-2 h-2.5 w-2.5 rounded-full ${
+                                  index === 0 || index === route.stops.length - 1 ? 'bg-[#96BD47]' : 'bg-[#0d1747]'
+                                }`}
+                              />
+                              <p className="text-[15px] font-semibold text-[#0d1747]">{stop.name}</p>
+                              <p className="text-[12px] text-[#687085]">
+                                {index === 0 ? 'Start' : index === route.stops.length - 1 ? 'End' : 'En-route'}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handlePlanWithRoute}
+                          className="mt-4 w-full bg-[#96BD47] hover:bg-[#7fa53a] text-white py-3.5 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2"
+                        >
+                          <span>Plan this route</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div className="mt-2">
+            {filteredRanks.length === 0 ? (
+              <p className="py-6 text-sm text-[#555d71]">No taxi ranks match.</p>
+            ) : (
+              filteredRanks.map((rank) => {
+                const isOpen = selectedRankId === rank.id;
+                return (
+                  <div key={rank.id} className="border-b border-[#ece9e0]">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRankId(isOpen ? null : rank.id)}
+                      className="w-full py-3.5 flex items-start gap-3 text-left"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-semibold text-[#0d1747]">{rank.name}</p>
+                      </div>
+                      <ChevronDown
+                        className={`w-4 h-4 mt-1 shrink-0 text-[#687085] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {isOpen && (
+                      <div className="pb-4">
+                        <Fact label="Location" value={rank.location} />
+
+                        <p className="mt-4 mb-1 text-[12px] text-[#687085]">Nearby Metrobus</p>
+                        {rank.nearbyMetrobus.map((link) => (
+                          <div key={link.stop} className="py-2.5 border-b border-[#ece9e0]">
+                            <p className="text-[18px] font-extrabold tabular-nums leading-none text-[#96BD47]">
+                              Routes {link.routes}
+                            </p>
+                            <p className="mt-2 text-[15px] font-semibold text-[#0d1747]">{link.stop}</p>
+                            <p className="mt-0.5 text-sm text-[#555d71] leading-relaxed">{link.detail}</p>
+                          </div>
+                        ))}
+
+                        <p className="mt-4 mb-1 text-[12px] text-[#687085]">Serves</p>
+                        <div className="relative pl-4">
+                          <div className="absolute left-[5px] top-1.5 bottom-1.5 w-px bg-[#96BD47]/45" aria-hidden />
+                          {rank.routes.map((item) => (
+                            <div key={item} className="relative py-1.5">
+                              <span className="absolute -left-4 top-2.5 h-2.5 w-2.5 rounded-full bg-[#96BD47]" />
+                              <p className="text-[15px] font-semibold text-[#0d1747]">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <p className="pt-3 text-sm text-[#555d71] leading-relaxed">{rank.note}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         )}
       </div>
 
-      {/* Filter pills */}
-      <div className="flex items-center gap-2 mb-2">
-        <button
-          onClick={() => setFilterDirection('all')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-            filterDirection === 'all'
-              ? 'bg-[#0d1747] text-white shadow-xs'
-              : 'bg-white text-[#0d1747] border border-[#dedad0]'
-          }`}
-        >
-          All routes <span className="opacity-70 ml-1">6</span>
-        </button>
-
-        <button
-          onClick={() => setFilterDirection('northbound')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-            filterDirection === 'northbound'
-              ? 'bg-[#0d1747] text-white shadow-xs'
-              : 'bg-white text-[#0d1747] border border-[#dedad0]'
-          }`}
-        >
-          Northbound <span className="opacity-70 ml-1">3</span>
-        </button>
-
-        <button
-          onClick={() => setFilterDirection('west')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-            filterDirection === 'west'
-              ? 'bg-[#0d1747] text-white shadow-xs'
-              : 'bg-white text-[#0d1747] border border-[#dedad0]'
-          }`}
-        >
-          West <span className="opacity-70 ml-1">2</span>
-        </button>
-      </div>
-
-      <p className="text-[11px] text-[#717b94] font-medium mb-3">
-        From city centre · Corridors A–F
-      </p>
-
-      {/* Routes List */}
-      <div className="space-y-2.5 mb-5">
-        {filteredRoutes.map((route) => {
-          const isSelected = selectedRouteId === route.id;
-
-          return (
-            <div
-              key={route.id}
-              onClick={() => setSelectedRouteId(route.id)}
-              className={`bg-white rounded-2xl p-3.5 border transition-all cursor-pointer shadow-xs ${
-                isSelected
-                  ? 'border-l-4 border-l-[#84ad32] border-[#84ad32]/50'
-                  : 'border-[#e5e1d7] hover:border-[#0d1747]'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
-                      route.letter === 'A'
-                        ? 'bg-[#84ad32] text-white'
-                        : 'bg-[#0d1747] text-white'
-                    }`}
-                  >
-                    {route.letter}
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-extrabold text-[#0d1747]">
-                      {route.title}
-                    </h3>
-                    <p className="text-[11px] text-[#555d71] font-medium">
-                      {route.via}
-                    </p>
-                    <p className="text-[10px] text-[#717b94]">
-                      Example {route.letter} · {route.interval} · {route.fare}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-[#798090]">
-                  {isSelected ? (
-                    <ChevronDown className="w-4 h-4 text-[#0d1747]" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Notice box */}
-      <div className="bg-[#eef3f6] border border-[#d8e3eb] p-3.5 rounded-2xl flex items-start gap-2.5 mb-6">
-        <Info className="w-4 h-4 text-[#1c3f76] shrink-0 mt-0.5" />
-        <p className="text-xs text-[#1c3f76] leading-relaxed font-medium">
-          This is a sample directory, not the full Metrobus network. Confirm official route numbers, stops and timetables before travelling.
-        </p>
-      </div>
-
-      {/* Selected Route Detail Section */}
-      <div className="mb-6">
-        <h3 className="text-base font-extrabold text-[#0d1747] mb-3">
-          Selected route · Example {selectedRoute.letter}
-        </h3>
-
-        {/* Navy Detail Card */}
-        <div className="bg-[#0d1747] text-white rounded-3xl p-5 shadow-lg border border-[#1b2762]">
-          {/* Top row with letter badge and Corridor tag */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-8 h-8 rounded-xl bg-white text-[#0d1747] flex items-center justify-center font-black text-sm">
-              {selectedRoute.letter}
-            </div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-white/70">
-              Example Corridor
-            </span>
-          </div>
-
-          {/* Corridor Headline */}
-          <div className="mb-5">
-            <h2 className="text-2xl font-extrabold tracking-tight leading-tight">
-              City centre<br />to {selectedRoute.destination}
-            </h2>
-            <p className="text-xs text-white/70 mt-1">
-              Via Jan Smuts Avenue · {selectedRoute.direction}
-            </p>
-          </div>
-
-          {/* Service Window & Interval Columns */}
-          <div className="grid grid-cols-2 gap-4 py-3 border-y border-white/15 mb-5">
-            <div>
-              <p className="text-[9px] font-extrabold uppercase tracking-wider text-white/60 mb-0.5">
-                Demo Service Window
-              </p>
-              <p className="text-base font-black">
-                {selectedRoute.serviceWindow}
-              </p>
-            </div>
-            <div>
-              <p className="text-[9px] font-extrabold uppercase tracking-wider text-white/60 mb-0.5">
-                Demo Interval
-              </p>
-              <p className="text-base font-black">
-                {selectedRoute.interval.split(' ')[0]} min
-              </p>
-            </div>
-          </div>
-
-          {/* Stops List */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between text-xs mb-3">
-              <span className="font-bold text-white">Example area stops</span>
-              <span className="text-white/60">{selectedRoute.stops.length} stops</span>
-            </div>
-
-            {/* Stop Sequence with Green Terminals */}
-            <div className="space-y-2.5 relative pl-4 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/20">
-              {selectedRoute.stops.map((stop, idx) => {
-                const isTerminal = idx === 0 || idx === selectedRoute.stops.length - 1;
-
-                return (
-                  <div key={stop.id} className="relative flex items-center gap-2.5 text-xs">
-                    <div
-                      className={`absolute -left-4 w-3.5 h-3.5 rounded-full flex items-center justify-center ${
-                        isTerminal
-                          ? 'bg-[#84ad32] ring-2 ring-white/30'
-                          : 'bg-[#0d1747] border-2 border-white/80'
-                      }`}
-                    >
-                      {isTerminal && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                    </div>
-                    <span
-                      className={`font-semibold ${
-                        isTerminal ? 'text-white font-extrabold' : 'text-white/80'
-                      }`}
-                    >
-                      {stop.name}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Plan with Route Button */}
-          <button
-            onClick={handlePlanWithRoute}
-            className="w-full bg-[#84ad32] hover:bg-[#749b29] active:scale-[0.99] text-white py-3.5 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
-          >
-            <span>Plan with Example {selectedRoute.letter}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <DisclaimerFooter />
-
-      {/* Bottom Nav */}
-      <BottomNav currentScreen="route-directory" onNavigate={onNavigate} />
+      <BottomNav currentScreen="route-directory" onNavigate={onNavigate} savedCount={savedCount} />
     </div>
   );
 };

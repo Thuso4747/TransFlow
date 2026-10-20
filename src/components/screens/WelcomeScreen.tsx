@@ -16,22 +16,17 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
         <TransFlowHeader onNavigate={onNavigate} />
 
         <div className="px-5 pt-6 pb-2">
-          {/* Section Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            WELCOME TO TRANSFLOW
-          </p>
-
-          {/* Headline */}
+          
           <h1 className="text-[34px] font-extrabold text-[#0d1747] tracking-tight leading-[1.08] mb-3">
             A clearer way<br />to get there.
           </h1>
 
-          {/* Subtitle */}
+          
           <p className="text-[13.5px] text-[#555d71] leading-relaxed mb-5">
             Know where to board, what to expect and how to find your way. One place for your everyday journey.
           </p>
 
-          {/* Primary Action Button */}
+          
           <button
             onClick={() => onNavigate('journey-planner')}
             className="w-full bg-[#84ad32] hover:bg-[#749b29] active:scale-[0.99] text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm transition-all mb-4"
@@ -40,7 +35,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          {/* Checklist row */}
+          
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] font-semibold text-[#555d71] mb-6">
             <span className="flex items-center gap-1">
               <Check className="w-3.5 h-3.5 text-[#84ad32]" />
@@ -58,13 +53,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
             </span>
           </div>
 
-          {/* Clarity Card matching PDF */}
+          
           <div className="bg-[#0d1747] text-white rounded-3xl p-5 shadow-md mb-5 overflow-hidden relative">
             <p className="text-[9px] font-extrabold tracking-widest uppercase text-white/70 mb-3">
               A LITTLE CLARITY GOES A LONG WAY
             </p>
 
-            {/* Schematic Network illustration */}
+            
             <div className="bg-[#121c4e] border border-white/10 rounded-2xl p-3.5 mb-4 relative">
               <div className="flex items-center gap-1.5 text-[9px] text-white/60 mb-2">
                 <Compass className="w-3 h-3 text-[#84ad32]" />
@@ -72,13 +67,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
               </div>
 
               <svg viewBox="0 0 280 90" className="w-full h-20">
-                {/* Background grid dots */}
+                
                 <circle cx="20" cy="45" r="1.5" fill="rgba(255,255,255,0.15)" />
                 <circle cx="80" cy="20" r="1.5" fill="rgba(255,255,255,0.15)" />
                 <circle cx="160" cy="70" r="1.5" fill="rgba(255,255,255,0.15)" />
                 <circle cx="240" cy="30" r="1.5" fill="rgba(255,255,255,0.15)" />
 
-                {/* Main line */}
+                
                 <path
                   d="M 25 60 Q 80 20, 140 45 T 255 30"
                   stroke="#84ad32"
@@ -87,7 +82,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
                   strokeLinecap="round"
                 />
 
-                {/* Transfer branch */}
+                
                 <path
                   d="M 140 45 L 180 80"
                   stroke="#ffffff"
@@ -96,7 +91,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
                   fill="none"
                 />
 
-                {/* Nodes */}
+                
                 <circle cx="25" cy="60" r="5" fill="#84ad32" stroke="#ffffff" strokeWidth="2" />
                 <circle cx="140" cy="45" r="5" fill="#0d1747" stroke="#ffffff" strokeWidth="2.5" />
                 <circle cx="255" cy="30" r="5" fill="#84ad32" stroke="#ffffff" strokeWidth="2" />
@@ -120,9 +115,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
             </div>
           </div>
 
-          {/* Quick feature links */}
+          
           <div className="space-y-2.5 mb-5">
-            {/* Know before you board */}
+            
             <div
               onClick={() => onNavigate('taxi-directory')}
               className="bg-white rounded-2xl p-4 border border-[#e5e1d7] flex items-center justify-between cursor-pointer hover:border-[#0d1747] transition-all shadow-2xs"
@@ -147,7 +142,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
               </div>
             </div>
 
-            {/* Keep your directions */}
+            
             <div
               onClick={() => onNavigate('saved-journeys')}
               className="bg-white rounded-2xl p-4 border border-[#e5e1d7] flex items-center justify-between cursor-pointer hover:border-[#0d1747] transition-all shadow-2xs"
@@ -168,12 +163,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate, savedC
             </div>
           </div>
 
-          {/* Transport names disclaimer */}
+          
           <div className="p-3 bg-[#edeae2]/60 rounded-2xl border border-[#dedad0] text-[11px] text-[#555d71] leading-relaxed mb-4">
             Transport names, fares and timetables are fictional demo data. Confirm real travel details with the operator.
           </div>
 
-          {/* Accessibility link */}
+          
           <div className="text-center pb-4">
             <button
               onClick={() => onNavigate('accessibility')}

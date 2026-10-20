@@ -36,22 +36,17 @@ export const TaxiRankDetailsScreen: React.FC<TaxiRankDetailsProps> = ({
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="taxi-directory" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            RANK DETAILS
-          </p>
-
-          {/* Title */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             {rank.name}
           </h1>
 
-          {/* Subtitle */}
+          
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xs text-[#555d71] font-semibold">{rank.destination}</span>
           </div>
 
-          {/* Indicative Single Fare Box */}
+          
           <div className="bg-[#f0f6e6] rounded-2xl p-4 border border-[#d6e5be] mb-5">
             <p className="text-[9px] font-extrabold uppercase tracking-wider text-[#456d17] mb-0.5">
               Indicative single fare
@@ -62,7 +57,7 @@ export const TaxiRankDetailsScreen: React.FC<TaxiRankDetailsProps> = ({
             </div>
           </div>
 
-          {/* Metadata Table */}
+          
           <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-5 space-y-3 text-xs">
             <div className="flex justify-between pb-2 border-b border-[#f0eee6]">
               <span className="text-[#798090]">Destination</span>
@@ -92,7 +87,7 @@ export const TaxiRankDetailsScreen: React.FC<TaxiRankDetailsProps> = ({
             </div>
           </div>
 
-          {/* Boarding advice checklist */}
+          
           <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-5 space-y-2.5 text-xs text-[#555d71]">
             <div className="flex items-start gap-2.5">
               <span className="text-[#84ad32] font-black text-sm leading-none">•</span>
@@ -108,7 +103,7 @@ export const TaxiRankDetailsScreen: React.FC<TaxiRankDetailsProps> = ({
             </div>
           </div>
 
-          {/* Report an issue Button */}
+          
           <button
             onClick={() => onNavigate('report-issue')}
             className="w-full bg-[#0d1747] hover:bg-[#15236b] text-white py-3.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"

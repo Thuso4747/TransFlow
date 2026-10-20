@@ -2,7 +2,7 @@ import React from 'react';
 import { ScreenId, AppAccessibilitySettings } from '../../types/transit';
 import { TransFlowHeader } from '../common/TransFlowHeader';
 import { BottomNav } from '../common/BottomNav';
-import { Info, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface DataPreferencesProps {
   onNavigate: (screen: ScreenId) => void;
@@ -12,125 +12,68 @@ interface DataPreferencesProps {
   savedCount?: number;
 }
 
+function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-11 h-6 rounded-full relative shrink-0 transition-colors ${on ? 'bg-[#96BD47]' : 'bg-[#c5c9d4]'}`}
+      aria-pressed={on}
+    >
+      <span
+        className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${on ? 'left-6' : 'left-1'}`}
+      />
+    </button>
+  );
+}
+
 export const DataPreferencesScreen: React.FC<DataPreferencesProps> = ({
   onNavigate,
   settings,
   onUpdateSettings,
-  offlineCount = 1,
+  offlineCount = 0,
   savedCount = 0,
 }) => {
   return (
-    <div className="min-h-screen pb-24 bg-[#f7f6f2] flex flex-col justify-between max-w-md mx-auto">
-      <div>
-        <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
+    <div className="min-h-full pb-20 bg-[#f7f6f2] max-w-md mx-auto">
+      <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
 
-        <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            YOUR JOURNEY, YOUR PREFERENCES
-          </p>
+      <div className="pt-5 px-4">
+        <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight">
+          Data preferences.
+        </h1>
+        <p className="mt-2 mb-6 text-sm text-[#555d71] leading-relaxed">
+          Control how TransFlow uses mobile data on this device.
+        </p>
 
-          {/* Title */}
-          <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
-            Make yourself at home.
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-[13px] text-[#555d71] leading-relaxed mb-4">
-            Adjust the experience to work for you.
-          </p>
-
-          {/* Sub-nav tabs */}
-          <div className="flex items-center gap-2 border-b border-[#dedad0] pb-2 mb-5 text-xs font-bold">
-            <button
-              onClick={() => onNavigate('accessibility')}
-              className="pb-1 px-1 text-[#798090] hover:text-[#0d1747]"
-            >
-              Accessibility
-            </button>
-            <button
-              onClick={() => onNavigate('accessibility')}
-              className="pb-1 px-1 text-[#798090] hover:text-[#0d1747]"
-            >
-              Appearance
-            </button>
-            <button
-              onClick={() => onNavigate('accessibility')}
-              className="pb-1 px-1 text-[#798090] hover:text-[#0d1747]"
-            >
-              Language
-            </button>
+        <div className="flex items-center justify-between gap-3 py-3.5 border-b border-[#ece9e0]">
+          <div className="pr-3">
+            <p className="text-[15px] font-semibold text-[#0d1747]">Low-data mode</p>
+            <p className="text-sm text-[#555d71]">Skip optional maps and auto-refresh</p>
           </div>
-
-          <h3 className="text-sm font-extrabold text-[#0d1747] mb-3">
-            Data &amp; offline
-          </h3>
-
-          {/* Low-data mode toggle */}
-          <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs flex items-center justify-between mb-3.5">
-            <div className="pr-3">
-              <h4 className="text-xs font-bold text-[#0d1747]">Low-data mode</h4>
-              <p className="text-[11px] text-[#555d71] leading-relaxed mt-0.5">
-                Hide optional maps until requested and avoid automatic refreshes.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => onUpdateSettings({ lowDataMode: !settings.lowDataMode })}
-              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${
-                settings.lowDataMode ? 'bg-[#84ad32]' : 'bg-slate-300'
-              }`}
-            >
-              <div
-                className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 ${
-                  settings.lowDataMode ? 'left-6' : 'left-1'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Download only on Wi-Fi toggle */}
-          <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs flex items-center justify-between mb-4">
-            <div className="pr-3">
-              <h4 className="text-xs font-bold text-[#0d1747]">Download only on Wi-Fi</h4>
-              <p className="text-[11px] text-[#555d71] leading-relaxed mt-0.5">
-                Ask before preparing a download when connection type is unknown.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => onUpdateSettings({ downloadOnlyWifi: !settings.downloadOnlyWifi })}
-              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${
-                settings.downloadOnlyWifi ? 'bg-[#84ad32]' : 'bg-slate-300'
-              }`}
-            >
-              <div
-                className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 ${
-                  settings.downloadOnlyWifi ? 'left-6' : 'left-1'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Connection note */}
-          <div className="p-3.5 bg-white rounded-2xl border border-[#dedad0] flex items-start gap-2.5 text-xs text-[#555d71] mb-5 shadow-2xs">
-            <Info className="w-4 h-4 text-[#798090] shrink-0 mt-0.5" />
-            <p className="leading-relaxed">
-              Connection type unavailable. This browser cannot reliably distinguish Wi-Fi, so we ask before downloads instead of claiming to enforce it.
-            </p>
-          </div>
-
-          {/* Manage offline copies link */}
-          <div className="pt-1">
-            <button
-              onClick={() => onNavigate('offline-downloads')}
-              className="text-xs font-bold text-[#0d1747] hover:underline flex items-center gap-1.5"
-            >
-              <span>Manage {offlineCount} offline copies</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <Toggle on={settings.lowDataMode} onClick={() => onUpdateSettings({ lowDataMode: !settings.lowDataMode })} />
         </div>
+        <div className="flex items-center justify-between gap-3 py-3.5 border-b border-[#ece9e0]">
+          <div className="pr-3">
+            <p className="text-[15px] font-semibold text-[#0d1747]">Download on Wi-Fi only</p>
+            <p className="text-sm text-[#555d71]">Ask before downloading on unknown connections</p>
+          </div>
+          <Toggle
+            on={settings.downloadOnlyWifi}
+            onClick={() => onUpdateSettings({ downloadOnlyWifi: !settings.downloadOnlyWifi })}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => onNavigate('offline-downloads')}
+          className="mt-6 w-full flex items-center justify-between py-3.5 text-left"
+        >
+          <span className="text-[15px] font-semibold text-[#0d1747]">
+            Offline copies{offlineCount ? ` · ${offlineCount}` : ''}
+          </span>
+          <ArrowRight className="w-4 h-4 text-[#687085]" />
+        </button>
       </div>
 
       <BottomNav currentScreen="data-preferences" onNavigate={onNavigate} savedCount={savedCount} />

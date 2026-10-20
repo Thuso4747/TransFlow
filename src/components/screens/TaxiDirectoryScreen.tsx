@@ -38,7 +38,6 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
   const [selectedRank, setSelectedRank] = useState<TaxiRank | null>(null);
   const [isAddRankModalOpen, setIsAddRankModalOpen] = useState(false);
 
-  // New Rank Form fields
   const [newRankName, setNewRankName] = useState('');
   const [newRankDest, setNewRankDest] = useState('');
   const [newRankFare, setNewRankFare] = useState('');
@@ -102,13 +101,9 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
   return (
     <div className="min-h-screen pb-24 bg-[#f7f6f2] flex flex-col justify-between max-w-md mx-auto">
       <div>
-        <TransFlowHeader onNavigate={onNavigate} />
+        <TransFlowHeader onNavigate={onNavigate} showBack backTo="more" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Header Tag matching Screen 07 */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            KNOW BEFORE YOU BOARD
-          </p>
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             Taxi information, clearly.
           </h1>
@@ -116,7 +111,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
             Search a rank. Check the fare. See and know where the information comes from.
           </p>
 
-      {/* Search Input */}
+      
       <div className="bg-white rounded-2xl border border-[#dedad0] p-3 flex items-center gap-2.5 mb-4 shadow-2xs">
         <Search className="w-4 h-4 text-[#798090] shrink-0" />
         <input
@@ -133,7 +128,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         )}
       </div>
 
-      {/* Filter Dropdown */}
+      
       <div className="mb-4">
         <label className="block text-[10px] font-extrabold tracking-wider text-[#798090] uppercase mb-1">
           Fare Information
@@ -152,12 +147,12 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         </div>
       </div>
 
-      {/* Directory Count */}
+      
       <div className="text-xs font-semibold text-[#555d71] mb-3">
         {filteredRanks.length} directory records
       </div>
 
-      {/* Ranks Cards List */}
+      
       <div className="space-y-4">
         {filteredRanks.map((rank) => {
           const isIndicative = rank.fareStatus === 'indicative';
@@ -167,11 +162,11 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
               key={rank.id}
               className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs"
             >
-              {/* Header: Icon + Name + Demo badge */}
+              
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-[#edeae2] flex items-center justify-center text-[#0d1747] shrink-0 mt-0.5">
-                    {/* Minibus Taxi Silhouette Icon */}
+                    
                     <svg className="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
                       <rect x="3" y="4" width="18" height="13" rx="2" />
                       <line x1="3" y1="10" x2="21" y2="10" />
@@ -190,7 +185,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
                 </div>
               </div>
 
-              {/* Fare Sub-card */}
+              
               <div
                 className={`rounded-2xl p-3.5 my-3.5 ${
                   isIndicative
@@ -210,7 +205,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
                 </p>
               </div>
 
-              {/* Source & Metadata */}
+              
               <div className="flex items-start gap-2 text-xs text-[#555d71] mb-3">
                 {isIndicative ? (
                   <FileText className="w-3.5 h-3.5 text-[#798090] shrink-0 mt-0.5" />
@@ -227,7 +222,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
                 </div>
               </div>
 
-              {/* View Rank Details Link */}
+              
               <div className="pt-2 border-t border-[#edeae2]">
                 <button
                   onClick={() => setSelectedRank(rank)}
@@ -242,7 +237,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         })}
       </div>
 
-      {/* Operator Warning Box */}
+      
       <div className="border border-dashed border-[#ccc7ba] rounded-2xl p-3.5 flex items-start gap-2.5 my-5 bg-white/50">
         <Info className="w-4 h-4 text-[#798090] shrink-0 mt-0.5" />
         <p className="text-xs text-[#555d71] leading-relaxed">
@@ -250,7 +245,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         </p>
       </div>
 
-      {/* Seed Network Footer Tag */}
+      
       <div className="flex items-center justify-between text-[10px] text-[#798090] px-1 font-mono pb-2">
         <span>TransFlow Transit Network</span>
         <span>Directory Records</span>
@@ -258,7 +253,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         </div>
       </div>
 
-      {/* Rank Detail Modal */}
+      
       {selectedRank && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end justify-center">
           <div className="bg-white rounded-t-3xl max-w-md w-full p-5 max-h-[85vh] overflow-y-auto animate-slideUp">
@@ -341,7 +336,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         </div>
       )}
 
-      {/* Add / Report Rank Modal */}
+      
       {isAddRankModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end justify-center">
           <div className="bg-white rounded-t-3xl max-w-md w-full p-5 max-h-[85vh] overflow-y-auto animate-slideUp">
@@ -437,7 +432,7 @@ export const TaxiDirectoryScreen: React.FC<TaxiDirectoryProps> = ({
         </div>
       )}
 
-      {/* Bottom Nav */}
+      
       <BottomNav currentScreen="taxi-directory" onNavigate={onNavigate} />
     </div>
   );

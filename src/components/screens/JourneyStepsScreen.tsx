@@ -53,24 +53,19 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="journey-results" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            KNOW EACH STEP
-          </p>
-
-          {/* Title */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             Your journey, made clearer.
           </h1>
 
-          {/* Subtitle */}
+          
           <div className="flex items-center gap-2 text-sm font-semibold text-[#555d71] mb-4">
             <span>{fromPlace}</span>
             <span className="text-[#84ad32] font-bold">→</span>
             <span>{toPlace}</span>
           </div>
 
-          {/* Summary Box */}
+          
           <div className="bg-white rounded-2xl p-4 border border-[#dedad0] grid grid-cols-3 text-center mb-5 shadow-2xs">
             <div>
               <p className="text-[9px] uppercase tracking-wider text-[#798090] font-bold mb-0.5">
@@ -92,13 +87,13 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
             </div>
           </div>
 
-          {/* Step by step timeline */}
+          
           <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-5 space-y-4">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#798090] mb-2">
               Follow your journey · Tue, 17 Nov 2026
             </h3>
 
-            {/* Step 1: Walk to Bay A */}
+            
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#edeae2] flex items-center justify-center text-[#0d1747] shrink-0 mt-0.5">
                 <Footprints className="w-4 h-4" />
@@ -116,7 +111,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               </div>
             </div>
 
-            {/* Step 2: Bus Line B */}
+            
             <div className="flex items-start gap-3 bg-[#f2f7e8] p-3.5 rounded-2xl border border-[#d6e5be]">
               <div className="w-8 h-8 rounded-xl bg-[#84ad32] text-white flex items-center justify-center font-black text-xs shrink-0">
                 B
@@ -137,7 +132,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               </div>
             </div>
 
-            {/* Step 3: Walk to Oak Street Bay B */}
+            
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#edeae2] flex items-center justify-center text-[#0d1747] shrink-0 mt-0.5">
                 <Footprints className="w-4 h-4" />
@@ -155,7 +150,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               </div>
             </div>
 
-            {/* Step 4: Bus Line B Connecting */}
+            
             <div className="flex items-start gap-3 bg-[#f2f7e8] p-3.5 rounded-2xl border border-[#d6e5be]">
               <div className="w-8 h-8 rounded-xl bg-[#0d1747] text-white flex items-center justify-center font-black text-xs shrink-0">
                 B
@@ -176,7 +171,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               </div>
             </div>
 
-            {/* Step 5: Arrival */}
+            
             <div className="flex items-start gap-3 pt-1">
               <MapPin className="w-5 h-5 text-[#84ad32] shrink-0 mt-0.5" />
               <div>
@@ -189,7 +184,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               </div>
             </div>
 
-            {/* View Route Map Button */}
+            
             <div className="pt-2">
               <button
                 onClick={() => onNavigate('route-map')}
@@ -210,7 +205,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
             </div>
           </div>
 
-          {/* Ready when you are section */}
+          
           <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-5 space-y-3">
             <h3 className="text-xs font-extrabold text-[#0d1747] mb-1">
               Ready when you are.
@@ -219,7 +214,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               Keep this journey close, download for offline, or share live updates with family.
             </p>
 
-            {/* Save Journey Button */}
+            
             <button
               onClick={onToggleSave}
               className={`w-full py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 border transition-all ${
@@ -232,7 +227,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               <span>{isSaved ? 'Remove saved journey' : 'Save journey'}</span>
             </button>
 
-            {/* Download for offline */}
+            
             <button
               onClick={onDownloadOffline}
               className={`w-full py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 border transition-all ${
@@ -245,7 +240,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
               <span>{isDownloaded ? 'Downloaded for offline (38 KB)' : 'Download for offline'}</span>
             </button>
 
-            {/* Start Sharing button -> Family sharing */}
+            
             <button
               onClick={() => onNavigate('sharing-consent')}
               className="w-full py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 bg-[#f0eee6] hover:bg-[#e4e1d7] text-[#0d1747] transition-colors"
@@ -255,7 +250,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
             </button>
           </div>
 
-          {/* About this information accordion */}
+          
           <div className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs mb-4">
             <button
               onClick={() => setIsAboutExpanded(!isAboutExpanded)}
@@ -294,7 +289,7 @@ export const JourneyStepsScreen: React.FC<JourneyStepsProps> = ({
             )}
           </div>
 
-          {/* Report an issue link */}
+          
           <div className="text-center pb-3">
             <button
               onClick={() => onNavigate('report-issue')}

@@ -71,19 +71,19 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="journey-planner" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Headline */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             Find your way forward.
           </h1>
 
-          {/* Subtitle */}
+          
           <div className="flex items-center gap-2 text-sm font-semibold text-[#555d71] mb-3">
             <span>{fromPlace}</span>
             <span className="text-[#84ad32] font-bold">→</span>
             <span>{toPlace}</span>
           </div>
 
-          {/* Edit search button */}
+          
           <button
             onClick={() => onNavigate('journey-planner')}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#0d1747] rounded-xl text-xs font-bold text-[#0d1747] hover:bg-[#0d1747] hover:text-white transition-all mb-4"
@@ -92,7 +92,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
             <span>Edit search</span>
           </button>
 
-          {/* Chips row */}
+          
           <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs mb-3">
             <div className="bg-white border border-[#dedad0] rounded-xl px-3 py-1.5 flex items-center gap-1.5 font-semibold text-[#0d1747] shrink-0 shadow-2xs">
               <Calendar className="w-3.5 h-3.5 text-[#555d71]" />
@@ -104,7 +104,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
             </div>
           </div>
 
-          {/* Sort & Filter Controls */}
+          
           <div className="flex items-center justify-between py-2 mb-3 border-y border-[#e5e1d7]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#0d1747]">
               <span className="text-[#798090]">Sort:</span>
@@ -130,7 +130,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
             </button>
           </div>
 
-          {/* Journeys List */}
+          
           <div className="space-y-3.5">
             {filteredJourneys.map((journey) => {
               const isSaved = savedJourneys.includes(journey.id);
@@ -141,7 +141,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
                   onClick={() => handleCardClick(journey)}
                   className="bg-white rounded-3xl p-4.5 border border-[#e5e1d7] shadow-xs hover:border-[#84ad32] transition-all cursor-pointer"
                 >
-                  {/* Badge & Favorite Row */}
+                  
                   <div className="flex items-center justify-between mb-3">
                     <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-sm ${journey.badgeStyle}`}>
                       {journey.badge}
@@ -160,7 +160,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
                     </button>
                   </div>
 
-                  {/* Main Schedule Row */}
+                  
                   <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 mb-3">
                     <div>
                       <p className="text-2xl font-extrabold text-[#0d1747] leading-tight">
@@ -204,7 +204,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
                     </div>
                   </div>
 
-                  {/* Fare & Crowding Row */}
+                  
                   <div className="flex items-center justify-between pt-2 pb-2 text-xs">
                     <div>
                       <span className="font-extrabold text-[#0d1747] text-base">
@@ -222,7 +222,7 @@ export const JourneyResultsScreen: React.FC<JourneyResultsProps> = ({
                     </div>
                   </div>
 
-                  {/* View journey steps link */}
+                  
                   <div className="border-t border-dashed border-[#e0dcce] pt-2 mt-1">
                     <div className="flex items-center justify-between text-xs font-bold text-[#0d1747] hover:text-[#84ad32] transition-colors">
                       <span>View journey steps</span>

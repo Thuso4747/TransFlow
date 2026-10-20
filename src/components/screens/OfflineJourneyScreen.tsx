@@ -21,22 +21,17 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
         <TransFlowHeader onNavigate={onNavigate} showBack backTo="offline-downloads" />
 
         <div className="px-5 pt-5 pb-2">
-          {/* Tag */}
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#717b94] mb-1.5">
-            READY WHEN DATA IS LOW
-          </p>
-
-          {/* Title */}
+          
           <h1 className="text-[32px] font-extrabold text-[#0d1747] tracking-tight leading-tight mb-1">
             Directions you can count on offline.
           </h1>
 
-          {/* Subtitle */}
+          
           <p className="text-[13px] text-[#555d71] leading-relaxed mb-4">
             Offline copies are stored on this device. Fares and service information can become outdated.
           </p>
 
-          {/* Offline Warning Banner matching Screen 20 */}
+          
           <div className="p-3.5 bg-[#fff8e6] border border-[#f5dfa6] rounded-2xl flex items-start gap-2.5 mb-5 text-[11px] text-[#8a5b00]">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
@@ -44,7 +39,7 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
             </p>
           </div>
 
-          {/* Fare & Duration Summary */}
+          
           <div className="bg-white rounded-2xl p-4 border border-[#dedad0] grid grid-cols-2 text-center mb-4 shadow-2xs">
             <div>
               <p className="text-xl font-extrabold text-[#0d1747]">R 22,00</p>
@@ -56,15 +51,15 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
             </div>
           </div>
 
-          {/* Departure */}
+          
           <div className="bg-[#edeae2] p-3 rounded-2xl flex items-center justify-between text-xs mb-4">
             <span className="text-[#798090] font-semibold">Scheduled: SAST</span>
             <span className="font-extrabold text-[#0d1747]">08:30 → 09:10</span>
           </div>
 
-          {/* Preserved Turn-by-Turn Steps */}
+          
           <div className="bg-white rounded-3xl p-5 border border-[#e5e1d7] shadow-xs mb-4 space-y-4">
-            {/* Step 1 */}
+            
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#edeae2] flex items-center justify-center text-[#0d1747] shrink-0 mt-0.5">
                 <Footprints className="w-4 h-4" />
@@ -80,7 +75,7 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
               </div>
             </div>
 
-            {/* Step 2 */}
+            
             <div className="flex items-start gap-3 bg-[#f2f7e8] p-3 rounded-2xl border border-[#d6e5be]">
               <div className="w-8 h-8 rounded-xl bg-[#84ad32] text-white flex items-center justify-center font-black text-xs shrink-0">
                 B
@@ -99,7 +94,7 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
               </div>
             </div>
 
-            {/* Step 3 */}
+            
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#edeae2] flex items-center justify-center text-[#0d1747] shrink-0 mt-0.5">
                 <Footprints className="w-4 h-4" />
@@ -115,7 +110,7 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
               </div>
             </div>
 
-            {/* Step 4 */}
+            
             <div className="flex items-start gap-3 bg-[#f2f7e8] p-3 rounded-2xl border border-[#d6e5be]">
               <div className="w-8 h-8 rounded-xl bg-[#0d1747] text-white flex items-center justify-center font-black text-xs shrink-0">
                 B
@@ -134,7 +129,7 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
               </div>
             </div>
 
-            {/* Step 5 */}
+            
             <div className="flex items-start gap-3 pt-1">
               <MapPin className="w-5 h-5 text-[#84ad32] shrink-0 mt-0.5" />
               <div>
@@ -146,7 +141,7 @@ export const OfflineJourneyScreen: React.FC<OfflineJourneyProps> = ({
             </div>
           </div>
 
-          {/* Schematic Preview */}
+          
           <div className="bg-[#edeae2] p-4 rounded-3xl border border-[#dedad0] mb-5">
             <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0d1747] mb-2">
               <Compass className="w-3.5 h-3.5 text-[#84ad32]" />

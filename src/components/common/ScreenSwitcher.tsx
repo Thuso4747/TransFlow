@@ -104,7 +104,7 @@ export const ScreenSwitcher: React.FC<ScreenSwitcherProps> = ({
           )}
         </div>
 
-        {/* Toggle between mobile frame & edge-to-edge view on larger displays */}
+        
         <button
           onClick={onToggleDeviceFrame}
           className="shrink-0 p-1.5 bg-[#1b2762] hover:bg-[#25357f] border border-white/10 rounded-lg text-white/80 hover:text-white transition-colors"

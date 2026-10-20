@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScreenId,
   CommuterUser,
@@ -8,6 +8,7 @@ import {
   TaxiRank,
   SavedJourney,
   OfflinePackage,
+  PastTrip,
   AppAccessibilitySettings,
 } from './types/transit';
 
@@ -19,9 +20,11 @@ import { CreateProfileScreen } from './components/screens/CreateProfileScreen';
 import { HomeDashboardScreen } from './components/screens/HomeDashboardScreen';
 import { JourneyMapScreen } from './components/screens/JourneyMapScreen';
 import { JourneyFilterScreen } from './components/screens/JourneyFilterScreen';
+import { JourneyStepsScreen } from './components/screens/JourneyStepsScreen';
 import { TaxiDirectoryScreen } from './components/screens/TaxiDirectoryScreen';
 import { TaxiRankDetailsScreen } from './components/screens/TaxiRankDetailsScreen';
 import { RouteDirectoryScreen } from './components/screens/RouteDirectoryScreen';
+import { RouteMapScreen } from './components/screens/RouteMapScreen';
 import { SavedJourneysScreen } from './components/screens/SavedJourneysScreen';
 import { MoreMenuScreen } from './components/screens/MoreMenuScreen';
 import { AccessibilityScreen } from './components/screens/AccessibilityScreen';
@@ -34,13 +37,35 @@ import { SourcesDataScreen } from './components/screens/SourcesDataScreen';
 import { ClearDataScreen } from './components/screens/ClearDataScreen';
 
 import { ProfileModal } from './components/modals/ProfileModal';
+import { MoreMenuProvider } from './components/common/MoreMenuContext';
+import {
+  loadA11y,
+  loadActiveTrip,
+  loadOfflinePackages,
+  loadPastTrips,
+  loadSavedJourneys,
+  saveA11y,
+  saveActiveTrip,
+  saveOfflinePackages,
+  savePastTrips,
+  saveSavedJourneys,
+} from './lib/offlineStore';
+
+const DEFAULT_A11Y: AppAccessibilitySettings = {
+  textSize: '100%',
+  highContrast: false,
+  reduceMotion: false,
+  darkMode: false,
+  language: 'English',
+  lowDataMode: false,
+  downloadOnlyWifi: true,
+};
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('onboarding-1');
   const [isDeviceFrame] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  // Commuter Profile State (starts clean so user can insert information)
   const [commuter, setCommuter] = useState<CommuterUser>({
     fullName: '',
     mobileNumber: '',
@@ -51,63 +76,85 @@ export default function App() {
     loadSheddingAlerts: true,
   });
 
-  // Active Journey Search Parameters (flowing seamlessly across screens)
   const [searchParams, setSearchParams] = useState<JourneySearchParams>({
-    fromLocation: 'Park Station',
-    toLocation: 'Rosebank Mall',
+    fromLocation: '',
+    toLocation: '',
     leaveDate: '2026-10-19',
-    leaveTime: 'Wed, 14 Oct · 08:10',
+    leaveTime: '',
     whenType: 'Depart at',
     preferences: 'Bus + walking · fewest transfers',
   });
 
-  // Selected Journey Itinerary for Map
-  const [selectedJourney, setSelectedJourney] = useState<JourneyOption | null>(null);
+  const [selectedJourney, setSelectedJourney] = useState<JourneyOption | null>(() =>
+    loadActiveTrip<JourneyOption | null>(null),
+  );
+  const [tripReturnScreen, setTripReturnScreen] = useState<ScreenId>('home-dashboard');
 
-  // Selected Taxi Rank for Details / Reporting
   const [selectedRank, setSelectedRank] = useState<TaxiRank | null>(null);
 
-  // Saved Journeys State
-  const [savedJourneys, setSavedJourneys] = useState<SavedJourney[]>([
-    {
-      id: 'sj-1',
-      title: 'Morning Work Commute',
-      origin: 'Park Station',
-      destination: 'Rosebank Mall',
-      fare: 'R18.00',
-      durationMinutes: 46,
-      dateSaved: '14 Oct 2026',
-      scheduledTime: '08:10 – 08:56',
-      isOfflineDownloaded: true,
-    },
-  ]);
+  const [savedJourneys, setSavedJourneys] = useState<SavedJourney[]>(() =>
+    loadSavedJourneys<SavedJourney[]>([]),
+  );
 
-  // Offline Download Packages State
-  const [offlinePackages, setOfflinePackages] = useState<OfflinePackage[]>([
-    {
-      id: 'pkg-1',
-      title: 'Corridor A: Park Station to Rosebank',
-      sizeKb: 840,
-      downloadDate: '14 Oct 2026',
-      origin: 'Park Station',
-      destination: 'Rosebank Mall',
-      fare: 'R18.00',
-      durationMinutes: 46,
-    },
-  ]);
+  const [offlinePackages, setOfflinePackages] = useState<OfflinePackage[]>(() =>
+    loadOfflinePackages<OfflinePackage[]>([]),
+  );
 
-  // Accessibility & Preferences State
-  const [accessibilitySettings, setAccessibilitySettings] = useState<AppAccessibilitySettings>({
-    textSize: '100%',
-    highContrast: false,
-    reduceMotion: false,
-    language: 'English',
-    lowDataMode: false,
-    downloadOnlyWifi: true,
+  const [pastTrips, setPastTrips] = useState<PastTrip[]>(() => loadPastTrips<PastTrip[]>([]));
+
+  const [accessibilitySettings, setAccessibilitySettings] = useState<AppAccessibilitySettings>(() => {
+    const loaded = { ...DEFAULT_A11Y, ...loadA11y<Partial<AppAccessibilitySettings>>({}) };
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('tf-dark', Boolean(loaded.darkMode));
+    }
+    return loaded;
   });
 
   const handleUpdateSearchParams = (params: Partial<JourneySearchParams>) => {
     setSearchParams((prev) => ({ ...prev, ...params }));
+  };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [currentScreen]);
+
+  useEffect(() => {
+    saveSavedJourneys(savedJourneys);
+  }, [savedJourneys]);
+
+  useEffect(() => {
+    saveOfflinePackages(offlinePackages);
+  }, [offlinePackages]);
+
+  useEffect(() => {
+    saveActiveTrip(selectedJourney);
+  }, [selectedJourney]);
+
+  useEffect(() => {
+    savePastTrips(pastTrips);
+  }, [pastTrips]);
+
+  useEffect(() => {
+    saveA11y(accessibilitySettings);
+    document.documentElement.classList.toggle('tf-dark', accessibilitySettings.darkMode);
+    document.body.classList.toggle('tf-dark', accessibilitySettings.darkMode);
+  }, [accessibilitySettings]);
+
+  const handleStartTrip = (journey: JourneyOption) => {
+    setSelectedJourney(journey);
+    setTripReturnScreen('home-dashboard');
+    setSearchParams((prev) => ({
+      ...prev,
+      fromLocation: journey.origin,
+      toLocation: journey.destination,
+      leaveTime: `${journey.departureTime} → ${journey.arrivalTime}`,
+    }));
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    setCurrentScreen('journey-map');
   };
 
   const handleUpdateCommuter = (data: Partial<CommuterUser>) => {
@@ -130,7 +177,7 @@ export default function App() {
   const handleSelectRouteForPlan = (route: MetroRoute) => {
     setSearchParams((prev) => ({
       ...prev,
-      fromLocation: 'Park Station',
+      fromLocation: route.origin,
       toLocation: route.destination,
     }));
     setCurrentScreen('home-dashboard');
@@ -152,6 +199,120 @@ export default function App() {
     setSavedJourneys((prev) =>
       prev.map((item) => (item.id === id ? { ...item, title: newTitle } : item))
     );
+  };
+
+  const handleDownloadJourney = (journey: JourneyOption) => {
+    const dateSaved = new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date());
+    const scheduledTime = `${journey.departureTime} – ${journey.arrivalTime}`;
+    const title = `${journey.origin} → ${journey.destination}`;
+
+    setSavedJourneys((prev) => {
+      const match = prev.find(
+        (item) =>
+          item.snapshot?.id === journey.id ||
+          (item.origin === journey.origin &&
+            item.destination === journey.destination &&
+            item.snapshot?.departureTime === journey.departureTime),
+      );
+      if (match) {
+        return prev.map((item) =>
+          item.id === match.id
+            ? { ...item, isOfflineDownloaded: true, snapshot: journey, scheduledTime, fare: journey.fare }
+            : item,
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: `sj-${Date.now()}`,
+          title,
+          origin: journey.origin,
+          destination: journey.destination,
+          fare: journey.fare,
+          durationMinutes: journey.durationMinutes,
+          dateSaved,
+          scheduledTime,
+          isOfflineDownloaded: true,
+          snapshot: journey,
+        },
+      ];
+    });
+
+    setOfflinePackages((prev) => {
+      const exists = prev.some(
+        (pkg) =>
+          pkg.snapshot?.id === journey.id ||
+          (pkg.origin === journey.origin &&
+            pkg.destination === journey.destination &&
+            pkg.snapshot?.departureTime === journey.departureTime),
+      );
+      if (exists) {
+        return prev.map((pkg) =>
+          pkg.origin === journey.origin && pkg.destination === journey.destination
+            ? { ...pkg, snapshot: journey, fare: journey.fare, downloadDate: dateSaved }
+            : pkg,
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: `pkg-${Date.now()}`,
+          title,
+          sizeKb: 650,
+          downloadDate: dateSaved,
+          origin: journey.origin,
+          destination: journey.destination,
+          fare: journey.fare,
+          durationMinutes: journey.durationMinutes,
+          snapshot: journey,
+        },
+      ];
+    });
+  };
+
+  const handleOpenSaved = (item: SavedJourney) => {
+    if (!item.snapshot) return;
+    setSelectedJourney(item.snapshot);
+    setTripReturnScreen('saved-journeys');
+    setCurrentScreen('journey-map');
+  };
+
+  const handleOpenOffline = (pkg: OfflinePackage) => {
+    if (!pkg.snapshot) return;
+    setSelectedJourney(pkg.snapshot);
+    setTripReturnScreen('saved-journeys');
+    setCurrentScreen('journey-map');
+  };
+
+  const handleEndTrip = () => {
+    if (selectedJourney) {
+      const now = new Date();
+      const endedDate = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0'),
+      ].join('-');
+      setPastTrips((prev) => [
+        {
+          id: `pt-${Date.now()}`,
+          origin: selectedJourney.origin,
+          destination: selectedJourney.destination,
+          fare: selectedJourney.fare,
+          durationMinutes: selectedJourney.durationMinutes,
+          scheduledTime: `${selectedJourney.departureTime} – ${selectedJourney.arrivalTime}`,
+          busLine: selectedJourney.busLine,
+          endedAt: now.toISOString(),
+          endedDate,
+        },
+        ...prev,
+      ]);
+    }
+    setSelectedJourney(null);
+    setCurrentScreen('journey-map');
   };
 
   const handleDownloadOffline = (id: string) => {
@@ -191,14 +352,7 @@ export default function App() {
     if (types.includes('saved')) setSavedJourneys([]);
     if (types.includes('offline')) setOfflinePackages([]);
     if (types.includes('preferences')) {
-      setAccessibilitySettings({
-        textSize: '100%',
-        highContrast: false,
-        reduceMotion: false,
-        language: 'English',
-        lowDataMode: false,
-        downloadOnlyWifi: true,
-      });
+      setAccessibilitySettings({ ...DEFAULT_A11Y });
     }
   };
 
@@ -235,6 +389,8 @@ export default function App() {
             onUpdateSearchParams={handleUpdateSearchParams}
             commuter={commuter}
             onOpenProfile={() => setIsProfileModalOpen(true)}
+            onStartTrip={handleStartTrip}
+            savedCount={savedJourneys.length}
           />
         );
       case 'journey-map':
@@ -243,6 +399,78 @@ export default function App() {
             onNavigate={setCurrentScreen}
             searchParams={searchParams}
             selectedJourney={selectedJourney}
+            onDownloadOffline={() => {
+              if (selectedJourney) handleDownloadJourney(selectedJourney);
+            }}
+            isOfflineDownloaded={Boolean(
+              selectedJourney &&
+                (offlinePackages.some(
+                  (pkg) =>
+                    pkg.origin === selectedJourney.origin &&
+                    pkg.destination === selectedJourney.destination,
+                ) ||
+                  savedJourneys.some(
+                    (item) =>
+                      item.isOfflineDownloaded &&
+                      item.origin === selectedJourney.origin &&
+                      item.destination === selectedJourney.destination,
+                  )),
+            )}
+            savedCount={savedJourneys.length}
+            backTo={tripReturnScreen}
+            pastTrips={pastTrips}
+            onEndTrip={handleEndTrip}
+          />
+        );
+      case 'journey-steps': {
+        const origin = selectedJourney?.origin || searchParams.fromLocation;
+        const destination = selectedJourney?.destination || searchParams.toLocation;
+        const matchingSaved = savedJourneys.find(
+          (j) => j.origin === origin && j.destination === destination
+        );
+        return (
+          <JourneyStepsScreen
+            onNavigate={setCurrentScreen}
+            selectedJourney={selectedJourney}
+            searchParams={searchParams}
+            isSaved={Boolean(matchingSaved)}
+            onToggleSave={() => {
+              if (matchingSaved) {
+                handleRemoveSaved(matchingSaved.id);
+                return;
+              }
+              setSavedJourneys((prev) => [
+                ...prev,
+                {
+                  id: `sj-${Date.now()}`,
+                  title: `${origin} to ${destination}`,
+                  origin,
+                  destination,
+                  fare: selectedJourney?.fare || 'R18.00',
+                  durationMinutes: selectedJourney?.durationMinutes || 46,
+                  dateSaved: 'Today',
+                  scheduledTime: selectedJourney
+                    ? `${selectedJourney.departureTime} – ${selectedJourney.arrivalTime}`
+                    : searchParams.leaveTime,
+                  isOfflineDownloaded: false,
+                },
+              ]);
+            }}
+            isDownloaded={Boolean(matchingSaved?.isOfflineDownloaded)}
+            onDownloadOffline={() => {
+              if (matchingSaved) handleDownloadOffline(matchingSaved.id);
+            }}
+            savedCount={savedJourneys.length}
+          />
+        );
+      }
+      case 'route-map':
+        return (
+          <RouteMapScreen
+            onNavigate={setCurrentScreen}
+            searchParams={searchParams}
+            selectedJourney={selectedJourney}
+            savedCount={savedJourneys.length}
           />
         );
       case 'journey-filter':
@@ -279,6 +507,7 @@ export default function App() {
           <RouteDirectoryScreen
             onNavigate={setCurrentScreen}
             onSelectRouteForPlan={handleSelectRouteForPlan}
+            savedCount={savedJourneys.length}
           />
         );
       case 'saved-journeys':
@@ -289,6 +518,7 @@ export default function App() {
             onRemoveSaved={handleRemoveSaved}
             onRenameSaved={handleRenameSaved}
             onDownloadOffline={handleDownloadOffline}
+            onOpenSaved={handleOpenSaved}
           />
         );
       case 'more':
@@ -320,7 +550,7 @@ export default function App() {
             onNavigate={setCurrentScreen}
             packages={offlinePackages}
             onRemovePackage={handleRemovePackage}
-            onUpdatePackage={handleUpdatePackage}
+            onOpenPackage={handleOpenOffline}
             savedCount={savedJourneys.length}
           />
         );
@@ -383,17 +613,24 @@ export default function App() {
             onUpdateSearchParams={handleUpdateSearchParams}
             commuter={commuter}
             onOpenProfile={() => setIsProfileModalOpen(true)}
+            onStartTrip={handleStartTrip}
+            savedCount={savedJourneys.length}
           />
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2] flex flex-col font-sans">
-      {/* Main App Container */}
+    <MoreMenuProvider
+      currentScreen={currentScreen}
+      onNavigate={setCurrentScreen}
+      onOpenProfile={() => setIsProfileModalOpen(true)}
+    >
+    <div className="min-h-[100dvh] bg-[#f7f6f2] flex flex-col font-sans overflow-x-hidden">
+      
       <div className="flex-1 flex justify-center items-start">
-        <main className="w-full max-w-md bg-[#f7f6f2] min-h-screen relative shadow-sm">
-          {/* Simulated Mobile Status Bar if in Device Frame */}
+        <main className="w-full max-w-md bg-[#f7f6f2] min-h-[100dvh] relative shadow-sm overflow-x-hidden">
+          
           {isDeviceFrame && (
             <div className="pt-3 px-6 flex items-center justify-between text-xs font-semibold text-[#0d1747] select-none bg-[#f7f6f2]">
               <span>08:10</span>
@@ -405,19 +642,21 @@ export default function App() {
             </div>
           )}
 
-          {/* Active Screen Content */}
-          <div className="w-full">{renderActiveScreen()}</div>
+          
+          <div className="w-full min-h-[100dvh]">{renderActiveScreen()}</div>
         </main>
       </div>
 
-      {/* Profile & MetroCard Top-up Modal */}
+      
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
         commuter={commuter}
         onUpdateCommuter={handleUpdateCommuter}
         onSignOut={handleSignOut}
+        onNavigate={setCurrentScreen}
       />
     </div>
+    </MoreMenuProvider>
   );
 }

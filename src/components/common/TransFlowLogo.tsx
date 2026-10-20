@@ -8,7 +8,7 @@ export const TransFlowLogo: React.FC<{ size?: 'sm' | 'md' | 'lg'; className?: st
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
-      {/* Icon: Stylized circular road & transit swirl */}
+      
       <svg
         width={iconSize}
         height={iconSize}
@@ -18,19 +18,19 @@ export const TransFlowLogo: React.FC<{ size?: 'sm' | 'md' | 'lg'; className?: st
         className="drop-shadow-sm"
       >
         <circle cx="50" cy="50" r="46" stroke="#0d1747" strokeWidth="4" className="opacity-15" />
-        {/* Outer curved dynamic path */}
+        
         <path
           d="M 50 10 A 40 40 0 0 1 90 50 A 40 40 0 0 1 50 90 A 40 40 0 0 1 18 72"
           stroke="#0d1747"
           strokeWidth="7"
           strokeLinecap="round"
         />
-        {/* Road perspective winding inside */}
+        
         <path
           d="M 22 76 C 35 70, 48 55, 48 30 C 48 22, 54 18, 62 20 C 72 23, 76 34, 76 46 C 76 68, 52 82, 36 84"
           fill="#1c2c77"
         />
-        {/* Road center dash marks */}
+        
         <path
           d="M 32 76 L 36 68"
           stroke="white"
@@ -49,7 +49,7 @@ export const TransFlowLogo: React.FC<{ size?: 'sm' | 'md' | 'lg'; className?: st
           strokeWidth="2"
           strokeLinecap="round"
         />
-        {/* Accent green flash */}
+        
         <path
           d="M 28 85 C 38 88, 54 86, 68 76"
           stroke="#84ad32"
@@ -58,7 +58,7 @@ export const TransFlowLogo: React.FC<{ size?: 'sm' | 'md' | 'lg'; className?: st
         />
       </svg>
 
-      {/* TRANSFLOW Typography */}
+      
       <div className="mt-3 flex items-center tracking-tight font-extrabold text-[#0d1747]">
         <span className={size === 'sm' ? 'text-lg tracking-wider' : size === 'lg' ? 'text-2xl tracking-widest' : 'text-xl tracking-widest'}>
           TRANSFLOW
