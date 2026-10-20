@@ -77,7 +77,7 @@ function Phone({ title, children }: { title: string; children: React.ReactNode }
     <div className="flex flex-col gap-2 shrink-0">
       <p className="text-[13px] font-bold text-[#0d1747] px-1">{title}</p>
       <div
-        className="w-[390px] h-[844px] overflow-hidden bg-[#f7f6f2] relative shadow-sm"
+        className="w-[390px] min-h-[844px] bg-[#f7f6f2] relative shadow-sm overflow-visible"
         style={{ transform: 'translateZ(0)' }}
       >
         {children}
@@ -106,7 +106,7 @@ export const FigmaBoardScreen: React.FC = () => {
             savedCount={1}
           />
         </Phone>
-        <Phone title="Trip · passed stops">
+        <Phone title="Trip · End trip">
           <JourneyMapScreen
             onNavigate={go}
             selectedJourney={SAMPLE_JOURNEY}
@@ -115,18 +115,6 @@ export const FigmaBoardScreen: React.FC = () => {
             onEndTrip={noop}
             onDownloadOffline={noop}
             initialCheckedTo={2}
-          />
-        </Phone>
-        <Phone title="Trip · Share live trip">
-          <JourneyMapScreen
-            onNavigate={go}
-            selectedJourney={SAMPLE_JOURNEY}
-            searchParams={FILLED_SEARCH}
-            savedCount={1}
-            onEndTrip={noop}
-            onDownloadOffline={noop}
-            initialCheckedTo={2}
-            initialShareOpen
           />
         </Phone>
       </div>

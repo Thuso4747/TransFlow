@@ -163,9 +163,10 @@ export default function App() {
 
   useEffect(() => {
     saveA11y(accessibilitySettings);
-    document.documentElement.classList.toggle('tf-dark', accessibilitySettings.darkMode);
-    document.body.classList.toggle('tf-dark', accessibilitySettings.darkMode);
-  }, [accessibilitySettings]);
+    const dark = currentScreen !== 'figma-board' && accessibilitySettings.darkMode;
+    document.documentElement.classList.toggle('tf-dark', dark);
+    document.body.classList.toggle('tf-dark', dark);
+  }, [accessibilitySettings, currentScreen]);
 
   const handleStartTrip = (journey: JourneyOption) => {
     setSelectedJourney(journey);
