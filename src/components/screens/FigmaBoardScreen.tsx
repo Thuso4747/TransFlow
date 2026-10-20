@@ -154,17 +154,27 @@ const SAVED: SavedJourney[] = [
   },
 ];
 
-function Phone({ title, children }: { title: string; children: React.ReactNode }) {
+const A11Y_DARK: AppAccessibilitySettings = { ...A11Y, darkMode: true };
+
+function Phone({ title, dark, children }: { title: string; dark?: boolean; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2 shrink-0">
       <p className="text-[13px] font-bold text-[#0d1747] px-1">{title}</p>
       <div
-        className="w-[390px] h-[844px] overflow-hidden bg-[#f7f6f2] relative shadow-sm"
+        className={`w-[390px] h-[844px] overflow-hidden relative shadow-sm ${
+          dark ? 'tf-dark bg-[#0d1747] text-white' : 'bg-[#f7f6f2]'
+        }`}
         style={{ transform: 'translateZ(0)' }}
       >
         {children}
       </div>
     </div>
+  );
+}
+
+function Heading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="w-full text-lg font-extrabold text-[#0d1747] pt-6 pb-1">{children}</h2>
   );
 }
 
@@ -202,6 +212,41 @@ export const FigmaBoardScreen: React.FC = () => {
             onStartTrip={noop}
           />
         </Phone>
+        <Phone title="Plan · From dropdown">
+          <HomeDashboardScreen
+            onNavigate={go}
+            searchParams={EMPTY_SEARCH}
+            onUpdateSearchParams={noop}
+            commuter={GUEST}
+            onOpenProfile={noop}
+            onStartTrip={noop}
+            initialPicker="from"
+          />
+        </Phone>
+        <Phone title="Plan · To dropdown">
+          <HomeDashboardScreen
+            onNavigate={go}
+            searchParams={FILLED_SEARCH}
+            onUpdateSearchParams={noop}
+            commuter={USER}
+            onOpenProfile={noop}
+            onStartTrip={noop}
+            savedCount={1}
+            initialPicker="to"
+          />
+        </Phone>
+        <Phone title="Plan · Leave at dropdown">
+          <HomeDashboardScreen
+            onNavigate={go}
+            searchParams={FILLED_SEARCH}
+            onUpdateSearchParams={noop}
+            commuter={USER}
+            onOpenProfile={noop}
+            onStartTrip={noop}
+            savedCount={1}
+            initialTimePickerOpen
+          />
+        </Phone>
         <Phone title="Plan · buses">
           <HomeDashboardScreen
             onNavigate={go}
@@ -215,6 +260,9 @@ export const FigmaBoardScreen: React.FC = () => {
         </Phone>
         <Phone title="Trip · empty">
           <JourneyMapScreen onNavigate={go} pastTrips={PAST} savedCount={1} />
+        </Phone>
+        <Phone title="Trip · today expanded">
+          <JourneyMapScreen onNavigate={go} pastTrips={PAST} savedCount={1} initialOpenPastId="pt-1" />
         </Phone>
         <Phone title="Trip · breakdown">
           <JourneyMapScreen
@@ -239,8 +287,19 @@ export const FigmaBoardScreen: React.FC = () => {
         <Phone title="Routes · bus">
           <RouteDirectoryScreen onNavigate={go} savedCount={1} />
         </Phone>
+        <Phone title="Routes · bus expanded">
+          <RouteDirectoryScreen onNavigate={go} savedCount={1} initialRouteId="mb-4" />
+        </Phone>
         <Phone title="Routes · taxi">
           <RouteDirectoryScreen onNavigate={go} savedCount={1} initialMode="taxi" />
+        </Phone>
+        <Phone title="Routes · taxi expanded">
+          <RouteDirectoryScreen
+            onNavigate={go}
+            savedCount={1}
+            initialMode="taxi"
+            initialRankId="mtn-noord"
+          />
         </Phone>
         <Phone title="Saved · empty">
           <SavedJourneysScreen
@@ -260,6 +319,17 @@ export const FigmaBoardScreen: React.FC = () => {
             onRenameSaved={noop}
             onDownloadOffline={noop}
             onOpenSaved={noop}
+          />
+        </Phone>
+        <Phone title="Saved · expanded">
+          <SavedJourneysScreen
+            onNavigate={go}
+            savedJourneys={SAVED}
+            onRemoveSaved={noop}
+            onRenameSaved={noop}
+            onDownloadOffline={noop}
+            onOpenSaved={noop}
+            initialOpenId="sv-1"
           />
         </Phone>
         <Phone title="Menu">
@@ -299,11 +369,111 @@ export const FigmaBoardScreen: React.FC = () => {
         <Phone title="Reports">
           <ReportIssueScreen onNavigate={go} selectedRank={null} savedCount={1} />
         </Phone>
-        <Phone title="Help">
-          <HelpFaqScreen onNavigate={go} savedCount={1} />
+        <Phone title="Reports · reason dropdown">
+          <ReportIssueScreen onNavigate={go} selectedRank={null} savedCount={1} initialReasonOpen />
+        </Phone>
+        <Phone title="Help · expanded">
+          <HelpFaqScreen onNavigate={go} savedCount={1} initialOpenIndex={0} />
         </Phone>
         <Phone title="About">
           <AboutScreen onNavigate={go} savedCount={1} />
+        </Phone>
+
+        <Heading>Dark mode</Heading>
+        <Phone title="Onboarding 3 · dark" dark>
+          <Onboarding3Screen onNavigate={go} />
+        </Phone>
+        <Phone title="Plan · buses · dark" dark>
+          <HomeDashboardScreen
+            onNavigate={go}
+            searchParams={FILLED_SEARCH}
+            onUpdateSearchParams={noop}
+            commuter={USER}
+            onOpenProfile={noop}
+            onStartTrip={noop}
+            savedCount={1}
+          />
+        </Phone>
+        <Phone title="Plan · From dropdown · dark" dark>
+          <HomeDashboardScreen
+            onNavigate={go}
+            searchParams={EMPTY_SEARCH}
+            onUpdateSearchParams={noop}
+            commuter={GUEST}
+            onOpenProfile={noop}
+            onStartTrip={noop}
+            initialPicker="from"
+          />
+        </Phone>
+        <Phone title="Trip · breakdown · dark" dark>
+          <JourneyMapScreen
+            onNavigate={go}
+            selectedJourney={SAMPLE_JOURNEY}
+            searchParams={FILLED_SEARCH}
+            savedCount={1}
+            onEndTrip={noop}
+            onDownloadOffline={noop}
+          />
+        </Phone>
+        <Phone title="Trip · live map · dark" dark>
+          <JourneyMapScreen
+            onNavigate={go}
+            selectedJourney={SAMPLE_JOURNEY}
+            searchParams={FILLED_SEARCH}
+            savedCount={1}
+            onEndTrip={noop}
+            initialLivePreview
+          />
+        </Phone>
+        <Phone title="Trip · today expanded · dark" dark>
+          <JourneyMapScreen onNavigate={go} pastTrips={PAST} savedCount={1} initialOpenPastId="pt-1" />
+        </Phone>
+        <Phone title="Routes · bus expanded · dark" dark>
+          <RouteDirectoryScreen onNavigate={go} savedCount={1} initialRouteId="mb-4" />
+        </Phone>
+        <Phone title="Routes · taxi expanded · dark" dark>
+          <RouteDirectoryScreen
+            onNavigate={go}
+            savedCount={1}
+            initialMode="taxi"
+            initialRankId="mtn-noord"
+          />
+        </Phone>
+        <Phone title="Saved · expanded · dark" dark>
+          <SavedJourneysScreen
+            onNavigate={go}
+            savedJourneys={SAVED}
+            onRemoveSaved={noop}
+            onRenameSaved={noop}
+            onDownloadOffline={noop}
+            onOpenSaved={noop}
+            initialOpenId="sv-1"
+          />
+        </Phone>
+        <Phone title="Menu · dark" dark>
+          <HomeDashboardScreen
+            onNavigate={go}
+            searchParams={EMPTY_SEARCH}
+            onUpdateSearchParams={noop}
+            commuter={USER}
+            onOpenProfile={noop}
+            onStartTrip={noop}
+            savedCount={1}
+          />
+          <MoreDrawer isOpen onClose={noop} onNavigate={go} />
+        </Phone>
+        <Phone title="Profile · dark" dark>
+          <ProfileModal
+            isOpen
+            onClose={noop}
+            commuter={USER}
+            onUpdateCommuter={noop}
+            onSignOut={noop}
+            onNavigate={go}
+          />
+        </Phone>
+        <Phone title="Accessibility · dark" dark>
+          <AccessibilityScreen onNavigate={go} settings={A11Y_DARK} onUpdateSettings={noop} savedCount={1} />
         </Phone>
       </div>
     </div>

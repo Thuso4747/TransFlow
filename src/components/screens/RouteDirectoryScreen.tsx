@@ -11,6 +11,8 @@ interface RouteDirectoryProps {
   onSelectRouteForPlan?: (route: MetroRoute) => void;
   savedCount?: number;
   initialMode?: 'bus' | 'taxi';
+  initialRouteId?: string | null;
+  initialRankId?: string | null;
 }
 
 function Fact({ label, value }: { label: string; value: string }) {
@@ -27,11 +29,13 @@ export const RouteDirectoryScreen: React.FC<RouteDirectoryProps> = ({
   onSelectRouteForPlan,
   savedCount = 0,
   initialMode = 'bus',
+  initialRouteId = null,
+  initialRankId = null,
 }) => {
   const [mode, setMode] = useState<'bus' | 'taxi'>(initialMode);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
-  const [selectedRankId, setSelectedRankId] = useState<string | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(initialRouteId);
+  const [selectedRankId, setSelectedRankId] = useState<string | null>(initialRankId);
 
   const filteredRoutes = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();

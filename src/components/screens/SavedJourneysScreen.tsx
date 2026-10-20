@@ -11,6 +11,7 @@ interface SavedJourneysProps {
   onRenameSaved: (id: string, newTitle: string) => void;
   onDownloadOffline: (id: string) => void;
   onOpenSaved: (item: SavedJourney) => void;
+  initialOpenId?: string | null;
 }
 
 export const SavedJourneysScreen: React.FC<SavedJourneysProps> = ({
@@ -20,8 +21,9 @@ export const SavedJourneysScreen: React.FC<SavedJourneysProps> = ({
   onRenameSaved,
   onDownloadOffline,
   onOpenSaved,
+  initialOpenId = null,
 }) => {
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(initialOpenId);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
 

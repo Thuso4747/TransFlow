@@ -19,6 +19,7 @@ interface JourneyMapProps {
   onEndTrip?: () => void;
   onDeletePastTrip?: (id: string) => void;
   initialLivePreview?: boolean;
+  initialOpenPastId?: string | null;
 }
 
 function minutesBetween(from: string, to: string): number {
@@ -135,8 +136,9 @@ export const JourneyMapScreen: React.FC<JourneyMapProps> = ({
   onEndTrip,
   onDeletePastTrip,
   initialLivePreview = false,
+  initialOpenPastId = null,
 }) => {
-  const [openPastId, setOpenPastId] = useState<string | null>(null);
+  const [openPastId, setOpenPastId] = useState<string | null>(initialOpenPastId);
   const [shareOpen, setShareOpen] = useState(false);
   const [sharePhone, setSharePhone] = useState('');
   const [shareError, setShareError] = useState('');

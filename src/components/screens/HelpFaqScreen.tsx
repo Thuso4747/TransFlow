@@ -7,6 +7,7 @@ import { ChevronDown, Search, X } from 'lucide-react';
 interface HelpFaqProps {
   onNavigate: (screen: ScreenId) => void;
   savedCount?: number;
+  initialOpenIndex?: number | null;
 }
 
 const FAQS = [
@@ -32,9 +33,13 @@ const FAQS = [
   },
 ];
 
-export const HelpFaqScreen: React.FC<HelpFaqProps> = ({ onNavigate, savedCount = 0 }) => {
+export const HelpFaqScreen: React.FC<HelpFaqProps> = ({
+  onNavigate,
+  savedCount = 0,
+  initialOpenIndex = 0,
+}) => {
   const [query, setQuery] = useState('');
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(initialOpenIndex);
 
   const filteredFaqs = FAQS.filter(
     (item) =>

@@ -9,6 +9,7 @@ interface ReportIssueProps {
   selectedRank: TaxiRank | null;
   onSaveReport?: (report: ReportItem) => void;
   savedCount?: number;
+  initialReasonOpen?: boolean;
 }
 
 const REASONS = [
@@ -24,10 +25,11 @@ export const ReportIssueScreen: React.FC<ReportIssueProps> = ({
   selectedRank,
   onSaveReport,
   savedCount = 0,
+  initialReasonOpen = false,
 }) => {
   const [reason, setReason] = useState(REASONS[0]);
   const [note, setNote] = useState('');
-  const [reasonOpen, setReasonOpen] = useState(false);
+  const [reasonOpen, setReasonOpen] = useState(initialReasonOpen);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [refCode, setRefCode] = useState('');
 

@@ -29,6 +29,8 @@ interface HomeDashboardProps {
   onOpenProfile: () => void;
   onStartTrip: (journey: JourneyOption) => void;
   savedCount?: number;
+  initialPicker?: 'from' | 'to' | null;
+  initialTimePickerOpen?: boolean;
 }
 
 export const HomeDashboardScreen: React.FC<HomeDashboardProps> = ({
@@ -37,12 +39,14 @@ export const HomeDashboardScreen: React.FC<HomeDashboardProps> = ({
   onUpdateSearchParams,
   onStartTrip,
   savedCount = 0,
+  initialPicker = null,
+  initialTimePickerOpen = false,
 }) => {
   const [fromPlace, setFromPlace] = useState(searchParams.fromLocation || '');
   const [toPlace, setToPlace] = useState(searchParams.toLocation || '');
   const [leaveTime, setLeaveTime] = useState(searchParams.leaveTime || '');
-  const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-  const [picker, setPicker] = useState<'from' | 'to' | null>(null);
+  const [isTimePickerOpen, setIsTimePickerOpen] = useState(initialTimePickerOpen);
+  const [picker, setPicker] = useState<'from' | 'to' | null>(initialPicker);
   const [placeQuery, setPlaceQuery] = useState('');
   const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
 
