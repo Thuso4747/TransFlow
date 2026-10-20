@@ -24,7 +24,7 @@ interface MoreMenuProps {
 type MenuItem = {
   id: string;
   title: string;
-  icon: typeof Eye;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   screen?: ScreenId;
   action?: 'profile';
 };

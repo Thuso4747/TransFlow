@@ -13,6 +13,20 @@ import {
 } from 'lucide-react';
 import { useMoreMenu } from './MoreMenuContext';
 
+const SignOutIcon: React.FC<{ className?: string; strokeWidth?: number }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="none" aria-hidden>
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit={10}
+      strokeWidth={1.5}
+      d="m17 16l4-4m0 0l-4-4m4 4H7m4 9H5.4A2.4 2.4 0 0 1 3 18.6V5.4A2.4 2.4 0 0 1 5.4 3H11"
+    />
+  </svg>
+);
+
 interface MoreDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,7 +36,7 @@ interface MoreDrawerProps {
 type MenuItem = {
   id: string;
   title: string;
-  icon: typeof Eye;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   screen?: ScreenId;
   action?: 'profile';
 };
@@ -51,7 +65,7 @@ const GROUPS: { label: string; items: MenuItem[] }[] = [
 ];
 
 export const MoreDrawer: React.FC<MoreDrawerProps> = ({ isOpen, onClose, onNavigate }) => {
-  const { openProfile } = useMoreMenu();
+  const { openProfile, signOut } = useMoreMenu();
 
   const handleItem = (item: MenuItem) => {
     if (item.action === 'profile') {
@@ -95,7 +109,7 @@ export const MoreDrawer: React.FC<MoreDrawerProps> = ({ isOpen, onClose, onNavig
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-5 pb-8">
+        <nav className="flex-1 overflow-y-auto px-5 pb-4">
           {GROUPS.map((group) => (
             <section key={group.label} className="mt-5 first:mt-1">
               <p className="text-[12px] text-[#687085] mb-1 px-0.5">{group.label}</p>
@@ -120,6 +134,17 @@ export const MoreDrawer: React.FC<MoreDrawerProps> = ({ isOpen, onClose, onNavig
             </section>
           ))}
         </nav>
+
+        <div className="px-5 pb-8 pt-2">
+          <button
+            type="button"
+            onClick={signOut}
+            className="w-full bg-[#c62828] hover:bg-[#b71c1c] text-white py-3.5 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2"
+          >
+            <SignOutIcon className="w-[18px] h-[18px]" />
+            Sign out
+          </button>
+        </div>
       </aside>
     </div>
   );

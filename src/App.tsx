@@ -171,7 +171,7 @@ export default function App() {
       savedRoutes: [],
       loadSheddingAlerts: true,
     });
-    setCurrentScreen('onboarding-1');
+    setCurrentScreen('sign-in');
   };
 
   const handleSelectRouteForPlan = (route: MetroRoute) => {
@@ -420,6 +420,7 @@ export default function App() {
             backTo={tripReturnScreen}
             pastTrips={pastTrips}
             onEndTrip={handleEndTrip}
+            onDeletePastTrip={(id) => setPastTrips((prev) => prev.filter((trip) => trip.id !== id))}
           />
         );
       case 'journey-steps': {
@@ -625,6 +626,7 @@ export default function App() {
       currentScreen={currentScreen}
       onNavigate={setCurrentScreen}
       onOpenProfile={() => setIsProfileModalOpen(true)}
+      onSignOut={handleSignOut}
     >
     <div className="min-h-[100dvh] bg-[#f7f6f2] flex flex-col font-sans overflow-x-hidden">
       

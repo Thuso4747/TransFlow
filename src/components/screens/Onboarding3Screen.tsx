@@ -42,10 +42,10 @@ export const Onboarding3Screen: React.FC<OnboardingProps> = ({ onNavigate }) => 
 
       <div className="relative z-10 -mt-28 px-6 pb-8 flex-1 flex flex-col justify-end space-y-4 text-center">
         <h1 className="text-3xl font-extrabold text-[#0d1747] tracking-tight leading-tight">
-          Stay ahead of delays &amp; disruptions.
+          Follow your trip. Share it live.
         </h1>
         <p className="text-[14px] text-[#555d71] leading-relaxed max-w-sm mx-auto">
-          Get instant WhatsApp and SMS alerts for traffic bottlenecks, load shedding impacts, and corridor schedule shifts before you head out.
+          Follow your trip on a live map, tick off stops as you pass them, and keep the journey on your phone even without signal. Share your ride so someone can watch you arrive.
         </p>
 
         <div className="flex items-center justify-center gap-2 pt-2">

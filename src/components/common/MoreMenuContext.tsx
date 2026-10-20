@@ -8,6 +8,7 @@ interface MoreMenuContextValue {
   handleSelect: (screen: ScreenId) => void;
   handleBackToMenu: () => void;
   openProfile: () => void;
+  signOut: () => void;
 }
 
 const MoreMenuContext = createContext<MoreMenuContextValue | null>(null);
@@ -25,6 +26,7 @@ interface MoreMenuProviderProps {
   currentScreen: ScreenId;
   onNavigate: (screen: ScreenId) => void;
   onOpenProfile?: () => void;
+  onSignOut?: () => void;
 }
 
 export const MoreMenuProvider: React.FC<MoreMenuProviderProps> = ({
@@ -32,6 +34,7 @@ export const MoreMenuProvider: React.FC<MoreMenuProviderProps> = ({
   currentScreen,
   onNavigate,
   onOpenProfile,
+  onSignOut,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const originRef = useRef<ScreenId>(currentScreen);
@@ -58,8 +61,13 @@ export const MoreMenuProvider: React.FC<MoreMenuProviderProps> = ({
     onOpenProfile?.();
   };
 
+  const signOut = () => {
+    setIsOpen(false);
+    onSignOut?.();
+  };
+
   return (
-    <MoreMenuContext.Provider value={{ isOpen, open, close, handleSelect, handleBackToMenu, openProfile }}>
+    <MoreMenuContext.Provider value={{ isOpen, open, close, handleSelect, handleBackToMenu, openProfile, signOut }}>
       {children}
     </MoreMenuContext.Provider>
   );

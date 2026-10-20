@@ -2,6 +2,20 @@ import React from 'react';
 import { CommuterUser, ScreenId } from '../../types/transit';
 import { TransFlowHeader } from '../common/TransFlowHeader';
 
+const SignOutIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="none" aria-hidden>
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit={10}
+      strokeWidth={1.5}
+      d="m17 16l4-4m0 0l-4-4m4 4H7m4 9H5.4A2.4 2.4 0 0 1 3 18.6V5.4A2.4 2.4 0 0 1 5.4 3H11"
+    />
+  </svg>
+);
+
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -56,8 +70,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               onSignOut();
               onClose();
             }}
-            className="mt-8 text-sm font-semibold text-[#c62828]"
+            className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#c62828]"
           >
+            <SignOutIcon className="w-[18px] h-[18px]" />
             Sign out
           </button>
         ) : (
